@@ -17,3 +17,6 @@ node_modules/
 # Remotion workspace build output; the rendered assets in assets/ are committed
 video/node_modules/
 video/out/
+
+# private working notes, same convention as personalRepos/noluyorAbi
+HANDOFF.md
