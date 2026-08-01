@@ -1,0 +1,7 @@
+# RFC 9116. Full policy and threat model: SECURITY.md in the repository.
+Contact: https://github.com/noluyorAbi/cockpit-claude/security/advisories/new
+Contact: mailto:alperen@adatepe.dev
+Expires: 2027-08-01T00:00:00.000Z
+Preferred-Languages: en, de
+Canonical: https://noluyorabi.github.io/cockpit-claude/.well-known/security.txt
+Policy: https://github.com/noluyorAbi/cockpit-claude/blob/main/SECURITY.md
