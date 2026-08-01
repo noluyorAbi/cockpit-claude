@@ -1,0 +1,12 @@
+# Normalise line endings so a Windows contributor does not rewrite every file.
+* text=auto eol=lf
+
+# Binary assets: never diffed, never line-ending-normalised.
+*.png binary
+*.mp4 binary
+
+# Keep GitHub's language stats about the tool, not about its website or its
+# generated assets. The statusline is the project; site/ is documentation.
+site/**       linguist-documentation
+docs/**       linguist-documentation
+scripts/banner.html linguist-generated
