@@ -1,0 +1,46 @@
+{
+  "name": "cockpit-claude",
+  "version": "1.0.0",
+  "description": "A four-line instrument panel for a Claude Code session: context, spend, rate-limit pace, and every session sharing your limit.",
+  "bin": {
+    "cockpit-claude": "bin/cockpit.js"
+  },
+  "main": "src/statusline.js",
+  "files": [
+    "bin",
+    "src",
+    "cockpit.config.example.json",
+    "docs",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "preview": "node bin/cockpit.js --preview",
+    "test": "node scripts/test.js"
+  },
+  "keywords": [
+    "claude",
+    "claude-code",
+    "statusline",
+    "status-line",
+    "terminal",
+    "cli",
+    "rate-limit",
+    "context-window",
+    "tui"
+  ],
+  "author": "noluyorAbi",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/noluyorAbi/cockpit-claude.git"
+  },
+  "homepage": "https://cockpit.js.org",
+  "bugs": {
+    "url": "https://github.com/noluyorAbi/cockpit-claude/issues"
+  }
+}

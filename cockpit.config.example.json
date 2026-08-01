@@ -1,0 +1,43 @@
+{
+  "$comment": "Every key is optional. A missing file gives you the full panel. Delete anything you do not want to override.",
+
+  "segments": {
+    "model": true,
+    "effort": true,
+    "style": true,
+    "cwd": true,
+    "git": true,
+    "context": true,
+    "tokens": true,
+    "cost": true,
+    "burn": true,
+    "ledger": true,
+    "churn": true,
+    "limits": true,
+    "pool": true,
+    "todos": true,
+    "updateNudge": true
+  },
+
+  "context": {
+    "autoCompactBuffer": 16.5,
+    "width": 10
+  },
+
+  "limits": {
+    "width": 8,
+    "projection": true
+  },
+
+  "pool": {
+    "staleSeconds": 600,
+    "activeSeconds": 90,
+    "minSessions": 2
+  },
+
+  "colors": {
+    "model": "magenta",
+    "cwd": "brightCyan",
+    "ledger": "gold"
+  }
+}

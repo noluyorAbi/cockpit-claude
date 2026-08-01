@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>banner source</title>
+<!--
+  Source for site/assets/banner.png (the GitHub social preview, 1280x640).
+  Rendered by scripts/build-banner.sh, which screenshots #banner.
+  Edit here, re-run that script, never hand-edit the PNG.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:      #100f0b;
+    --fg:      #ece8dd;
+    --dim:     rgba(236,232,221,.42);
+    --gray:    #8f8a7d;
+    --magenta: #d68ad0;
+    --cyan:    #56b8c4;
+    --bcyan:   #85e7f2;
+    --green:   #83cb6d;
+    --yellow:  #ddc44a;
+    --orange:  #ff8f2e;
+    --red:     #f0655f;
+    --gold:    #ffd233;
+    --accent:  #dfa440;
+    --mono:    "JetBrains Mono", ui-monospace, monospace;
+    --font:    "Space Grotesk", system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  /* The page IS the banner: 1280x640 exactly, so a full-page capture is the
+     asset with no cropping maths. */
+  html, body { width: 1280px; height: 640px; overflow: hidden; background: var(--bg); }
+
+  #banner {
+    width: 1280px; height: 640px;
+    position: relative; overflow: hidden;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font);
+    padding: 64px 72px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  /* a warm instrument glow, low and off to the right */
+  #banner::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(720px 420px at 88% 8%, rgba(223,164,64,.16), transparent 62%),
+      radial-gradient(520px 340px at 12% 100%, rgba(240,101,95,.09), transparent 60%);
+  }
+  #banner > * { position: relative; }
+
+  .row { display: flex; align-items: center; justify-content: space-between; }
+
+  .mark { display: flex; align-items: center; gap: 12px;
+          font-family: var(--mono); font-size: 19px; font-weight: 700; letter-spacing: .16em; }
+  .mark .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--accent);
+               box-shadow: 0 0 0 6px rgba(223,164,64,.14); }
+  .mark .sub { color: var(--dim); font-weight: 400; }
+  .meta { font-family: var(--mono); font-size: 15px; letter-spacing: .1em; color: var(--dim); }
+
+  h1 { font-size: 72px; font-weight: 700; line-height: .98; letter-spacing: -.042em; }
+  h1 .soft { color: var(--dim); }
+
+  .panel {
+    border: 1px solid rgba(255,246,220,.13);
+    border-radius: 14px;
+    background: rgba(255,246,220,.035);
+    padding: 22px 26px;
+    font-family: var(--mono); font-size: 23px; line-height: 1.75;
+    white-space: pre;
+    box-shadow: 0 0 44px -12px rgba(240,101,95,.28);
+  }
+
+  .cmd { font-family: var(--mono); font-size: 25px; }
+  .cmd .p { color: var(--green); }
+  .site { font-family: var(--mono); font-size: 17px; color: var(--dim); letter-spacing: .06em; }
+
+  .magenta{color:var(--magenta)} .cyan{color:var(--cyan)} .bcyan{color:var(--bcyan)}
+  .green{color:var(--green)} .yellow{color:var(--yellow)} .orange{color:var(--orange)}
+  .red{color:var(--red)} .gold{color:var(--gold)} .gray{color:var(--gray)} .dim{color:var(--dim)}
+  .b { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div id="banner">
+
+  <div class="row">
+    <div class="mark"><span class="dot"></span>COCKPIT<span class="sub">· CLAUDE</span></div>
+    <div class="meta">MIT · ZERO DEPENDENCIES</div>
+  </div>
+
+  <h1>Your session,<br><span class="soft">from the</span> flight deck.</h1>
+
+  <div class="panel"><span class="magenta b">Opus 5 (1M)</span><span class="red b"> ·high ↓ease</span><span class="dim">  │  </span><span class="dim">ctx </span><span class="orange">██████░░░░  74%</span><span class="dim">  │  </span><span class="green">$4.82</span><span class="dim"> ⌁$6.9/hr</span>
+<span class="gray b">5h </span><span class="orange">▰▰▰▰▰▰▱▱ 78%</span><span class="dim"> ↻1h12m </span><span class="red b">⚡cap~34m</span><span class="dim">  │  </span><span class="dim">pool </span><span class="yellow">5 live</span><span class="dim"> ⌁Σ$31/hr</span></div>
+
+  <div class="row">
+    <div class="cmd"><span class="p">$</span> npx cockpit-claude</div>
+    <div class="site">cockpit.js.org</div>
+  </div>
+
+</div>
+
+</body>
+</html>

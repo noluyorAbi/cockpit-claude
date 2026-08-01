@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="cockpit">
+  <rect width="64" height="64" rx="14" fill="#17160f"/>
+  <!-- four lines of an instrument panel, the fourth one hot -->
+  <rect x="12" y="17" width="34" height="4" rx="2" fill="#d68ad0"/>
+  <rect x="12" y="27" width="26" height="4" rx="2" fill="#83cb6d"/>
+  <rect x="12" y="37" width="30" height="4" rx="2" fill="#ffd233"/>
+  <rect x="12" y="47" width="16" height="4" rx="2" fill="#f0655f"/>
+  <circle cx="50" cy="49" r="4" fill="#ff8f2e"/>
+</svg>

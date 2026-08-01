@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>cockpit · claude / a four-line instrument panel for Claude Code</title>
+<meta name="description" content="A four-line statusline for Claude Code. Usable context, spend rate, rate-limit pace projection, and every session sharing your limit. Zero dependencies.">
+<meta name="color-scheme" content="light dark">
+
+<meta property="og:title" content="cockpit · claude">
+<meta property="og:description" content="Your session, from the flight deck. Four lines: context, spend, limit pace, and the sessions you forgot were running.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://cockpit.js.org">
+<meta property="og:image" content="https://cockpit.js.org/assets/banner.png">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <a class="brand" href="#top">
+    <button class="beacon" id="beacon" type="button" aria-label="Trigger a burn-rate spike in the demo panel" title="go on, press it"></button>
+    <span class="brand-name">COCKPIT</span>
+    <span class="brand-sep">·</span>
+    <span class="brand-sub">CLAUDE</span>
+  </a>
+  <nav class="nav" aria-label="Primary">
+    <a href="#signals">Signals</a>
+    <a href="#difference">Why four lines</a>
+    <a href="#internals">Under the hood</a>
+    <a href="#config">Config</a>
+    <a class="ext" href="https://github.com/noluyorAbi/cockpit-claude">GitHub<span aria-hidden="true">↗</span></a>
+  </nav>
+</header>
+
+<main id="main">
+<div class="sheet" id="top">
+
+  <!-- ── hero ───────────────────────────────────────────────────────── -->
+  <section class="hero">
+    <p class="eyebrow"><span class="dot" aria-hidden="true"></span> CLAUDE CODE <span class="sep">·</span> STATUSLINE</p>
+    <h1>Your session,<br>from the flight deck.</h1>
+    <p class="lede">
+      Four lines under your prompt. How much context you can <em>actually</em> still use,
+      what this session is costing per hour, whether your pace will hit the 5-hour cap
+      before it resets, and how many other sessions are quietly eating the same limit.
+    </p>
+
+    <!-- the live panel -->
+    <div class="panel-wrap">
+      <div class="panel-chrome" aria-hidden="true">
+        <span class="tl-dot"></span><span class="tl-dot"></span><span class="tl-dot"></span>
+        <span class="tl-title">claude · cockpit</span>
+        <span class="live-tag" id="liveTag">LIVE</span>
+      </div>
+      <div class="panel" id="panel" role="img" aria-label="A live simulation of the cockpit statusline: model, context bar, token counts, session cost, repo lifetime cost, five-hour and seven-day rate limit bars, and the count of concurrent sessions."></div>
+    </div>
+    <p class="narration" id="narration" aria-live="polite">Session warming up.</p>
+
+    <!-- install -->
+    <div class="install">
+      <button class="cmd" id="copyBtn" type="button" title="Copy to clipboard">
+        <span class="prompt" aria-hidden="true">$</span>
+        <code>npx cockpit-claude</code>
+        <span class="copy-label" id="copyLabel">COPY</span>
+      </button>
+      <p class="fineprint">
+        Node 18+. macOS, Linux, Windows. Backs up <code>settings.json</code> before it touches it.
+        <br><span class="dim">Not ready to commit? <code>npx cockpit-claude --dry-run</code> shows every change and writes nothing.</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ── the difference ─────────────────────────────────────────────── -->
+  <section id="difference" class="band">
+    <p class="kicker">WHY FOUR LINES</p>
+    <h2>Three things one line can't tell you.</h2>
+    <p class="section-lede">
+      A single line has room for the numbers. It has no room for what they <em>mean</em> next.
+      These three are the reason cockpit is four.
+    </p>
+
+    <ol class="diffs">
+      <li class="diff">
+        <span class="diff-n">01</span>
+        <div class="diff-body">
+          <h3>Context you can actually use</h3>
+          <p>
+            Auto-compact fires while there is still headroom on the clock, so a raw
+            <span class="mono">82% remaining</span> is a lie about how much room you really have.
+            cockpit subtracts the buffer and shows <em>usable</em> context, so 100% means
+            compaction, not empty.
+          </p>
+          <div class="mini mono" aria-hidden="true">
+            <div class="mini-row"><span class="mini-label">raw</span><span class="c-green">████░░░░░░  38%</span><span class="mini-note">looks fine</span></div>
+            <div class="mini-row"><span class="mini-label">cockpit</span><span class="c-orange">██████░░░░  65%</span><span class="mini-note">compaction is closer than that</span></div>
+          </div>
+        </div>
+      </li>
+
+      <li class="diff">
+        <span class="diff-n">02</span>
+        <div class="diff-body">
+          <h3>Pace, not just position</h3>
+          <p>
+            <span class="mono">62%</span> used means nothing without knowing how fast you got there.
+            cockpit extrapolates your burn against the window and prints where you will
+            <em>land</em>. If that lands past 100%, it prints the clock until you're capped
+            and tells the effort badge to say <span class="mono c-red">↓ease</span>.
+          </p>
+          <div class="mini mono" aria-hidden="true">
+            <div class="mini-row"><span class="mini-label">5h</span><span class="c-yellow">▰▰▰▰▰▱▱▱ 62%</span><span class="dim">↻2h15m</span><span class="c-red bold">⚡cap~1h41m</span></div>
+            <div class="mini-row"><span class="mini-label">7d</span><span class="c-green">▰▰▱▱▱▱▱▱ 31%</span><span class="dim">↻2d14h</span><span class="c-green">→49%</span></div>
+          </div>
+        </div>
+      </li>
+
+      <li class="diff">
+        <span class="diff-n">03</span>
+        <div class="diff-body">
+          <h3>The sessions you forgot were running</h3>
+          <p>
+            Rate limits are billed to the account, not the window. Four terminals open means
+            four sessions draining one budget, and each of them thinks it is alone.
+            Every cockpit heartbeats to a shared temp file, so each panel can show the
+            whole fleet and its combined burn.
+          </p>
+          <div class="mini mono" aria-hidden="true">
+            <div class="mini-row"><span class="mini-label">pool</span><span class="c-yellow">5 live</span><span class="dim">⌁Σ$31/hr</span><span class="mini-note">you are one fifth of that number</span></div>
+          </div>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ── signal inspector ───────────────────────────────────────────── -->
+  <section id="signals" class="band">
+    <p class="kicker">WHAT IT SHOWS</p>
+    <h2>Fourteen signals, four lines.</h2>
+    <p class="section-lede">
+      Point at any part of the panel. Tap on touch, or use <kbd>←</kbd> <kbd>→</kbd> once focused.
+    </p>
+
+    <div class="inspector">
+      <div class="panel-wrap static">
+        <div class="panel" id="staticPanel" tabindex="0" role="group" aria-label="Statusline segments, use arrow keys to inspect"></div>
+      </div>
+      <div class="detail" id="detail" aria-live="polite">
+        <p class="detail-idle">Hover a segment to read it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── internals ──────────────────────────────────────────────────── -->
+  <section id="internals" class="band">
+    <p class="kicker">UNDER THE HOOD</p>
+    <h2>Boring where it counts.</h2>
+
+    <div class="cards">
+      <article class="card">
+        <span class="card-n">01</span>
+        <h3>One payload in</h3>
+        <p>Claude Code pipes a JSON blob to the statusline command on every render. cockpit reads that, your repo's cost ledger, and git. Nothing else.</p>
+      </article>
+      <article class="card">
+        <span class="card-n">02</span>
+        <h3>No network, ever</h3>
+        <p>Zero dependencies, zero fetches, zero telemetry. Rate limits arrive inside the payload. Nothing about your session leaves the machine.</p>
+      </article>
+      <article class="card">
+        <span class="card-n">03</span>
+        <h3>Fails to blank, not to a stack trace</h3>
+        <p>Every reader is wrapped. A missing ledger, a corrupt config, a repo with no upstream: the segment drops out and the rest of the panel renders.</p>
+      </article>
+      <article class="card">
+        <span class="card-n">04</span>
+        <h3>It doesn't jitter</h3>
+        <p>Live numbers sit in fixed-width fields. Your spend rolling from <span class="mono">$9.99</span> to <span class="mono">$10.00</span> won't shove the whole line sideways mid-thought.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ── config ─────────────────────────────────────────────────────── -->
+  <section id="config" class="band">
+    <p class="kicker">CONFIG</p>
+    <h2>Every segment has an off switch.</h2>
+    <p class="section-lede">
+      Drop a <span class="mono">cockpit.config.json</span> next to your settings. Everything is optional;
+      a missing file gives you the full panel.
+    </p>
+
+    <div class="code-block">
+      <div class="code-head mono"><span>~/.claude/cockpit.config.json</span></div>
+<pre class="mono"><code><span class="t-p">{</span>
+  <span class="t-k">"segments"</span><span class="t-p">:</span> <span class="t-p">{</span> <span class="t-k">"ledger"</span><span class="t-p">:</span> <span class="t-b">false</span><span class="t-p">,</span> <span class="t-k">"todos"</span><span class="t-p">:</span> <span class="t-b">false</span> <span class="t-p">},</span>
+  <span class="t-k">"context"</span><span class="t-p">:</span>  <span class="t-p">{</span> <span class="t-k">"autoCompactBuffer"</span><span class="t-p">:</span> <span class="t-n">16.5</span><span class="t-p">,</span> <span class="t-k">"width"</span><span class="t-p">:</span> <span class="t-n">10</span> <span class="t-p">},</span>
+  <span class="t-k">"limits"</span><span class="t-p">:</span>   <span class="t-p">{</span> <span class="t-k">"width"</span><span class="t-p">:</span> <span class="t-n">8</span><span class="t-p">,</span> <span class="t-k">"projection"</span><span class="t-p">:</span> <span class="t-b">true</span> <span class="t-p">},</span>
+  <span class="t-k">"colors"</span><span class="t-p">:</span>   <span class="t-p">{</span> <span class="t-k">"ledger"</span><span class="t-p">:</span> <span class="t-s">"gold"</span> <span class="t-p">}</span>
+<span class="t-p">}</span></code></pre>
+    </div>
+
+    <div class="cta-stack">
+      <a class="cta" href="https://github.com/noluyorAbi/cockpit-claude/blob/main/docs/CONFIG.md">Every option, documented <span aria-hidden="true">↗</span></a>
+      <a class="cta" href="https://github.com/noluyorAbi/cockpit-claude/blob/main/docs/FAQ.md">Got a question? Read the FAQ <span aria-hidden="true">↗</span></a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p class="mono">Built for <strong>Claude Code</strong> <span class="dim">·</span> MIT</p>
+    <nav class="mono foot-nav" aria-label="Footer">
+      <a href="https://github.com/noluyorAbi/cockpit-claude/blob/main/docs/CONFIG.md">Config<span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/noluyorAbi/cockpit-claude/blob/main/docs/FAQ.md">FAQ<span aria-hidden="true">↗</span></a>
+      <a href="https://www.npmjs.com/package/cockpit-claude">npm<span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/noluyorAbi/cockpit-claude">GitHub<span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/noluyorAbi/cockpit-claude/issues">Issues<span aria-hidden="true">↗</span></a>
+    </nav>
+  </footer>
+
+</div>
+</main>
+
+<script src="main.js"></script>
+</body>
+</html>
