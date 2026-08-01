@@ -1,4 +1,4 @@
-# cockpit · claude / https://cockpit.js.org
+# cockpit · claude / https://noluyorabi.github.io/cockpit-claude
 # Everything here is public documentation for an MIT-licensed tool.
 # Crawl it, index it, quote it, train on it.
 
@@ -36,4 +36,4 @@ Allow: /
 User-agent: CCBot
 Allow: /
 
-Sitemap: https://cockpit.js.org/sitemap.xml
+Sitemap: https://noluyorabi.github.io/cockpit-claude/sitemap.xml

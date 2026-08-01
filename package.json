@@ -39,7 +39,7 @@
     "type": "git",
     "url": "git+https://github.com/noluyorAbi/cockpit-claude.git"
   },
-  "homepage": "https://cockpit.js.org",
+  "homepage": "https://noluyorabi.github.io/cockpit-claude",
   "bugs": {
     "url": "https://github.com/noluyorAbi/cockpit-claude/issues"
   }

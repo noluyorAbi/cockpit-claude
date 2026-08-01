@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         Forks, extra segments, terminal themes, ports to other tools, anything
-        that reads the same numbers. Accepted entries go on cockpit.js.org.
+        that reads the same numbers. Accepted entries go on the website.
 
         You do not need to have contributed to this repo first.
   - type: input

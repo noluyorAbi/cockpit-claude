@@ -14,19 +14,31 @@ it. Enable it once, under **Settings → Pages → Source → GitHub Actions**.
 
 That gives you `https://<user>.github.io/cockpit-claude/`.
 
-## The cockpit.js.org domain
+## Moving to a custom domain
 
-The site links and the `og:url` already point at `https://cockpit.js.org`. That domain
-does not exist until it is requested, so do these two steps **in order**:
+Every canonical URL, `og:url`, JSON-LD `@id`, sitemap entry and `llms.txt` link
+currently points at `https://noluyorabi.github.io/cockpit-claude`, because that is the
+origin that actually serves the page. This matters more than it looks: a canonical
+pointing at a domain that does not resolve tells a crawler the real page is somewhere
+it cannot fetch, which suppresses indexing of the page that does exist.
 
-1. Open a PR against [js-org/js.org](https://github.com/js-org/js.org) adding
-   `cockpit.js.org` pointed at your Pages target, and wait for it to merge.
-2. Only then add `site/CNAME` containing `cockpit.js.org` and push.
+So the order is fixed, and it is the reverse of what feels natural:
 
-Adding the `CNAME` file first is the failure mode worth avoiding: GitHub Pages starts
-redirecting to a domain that does not resolve yet, and the site is unreachable at both
-addresses until the js.org PR lands. There is deliberately no `CNAME` in this repo for
-that reason.
+1. Get the domain working first. For js.org, open a PR against
+   [js-org/js.org](https://github.com/js-org/js.org) pointing `cockpit.js.org` at the
+   Pages target, and wait for it to merge.
+2. Add `site/CNAME` containing the domain and push. Adding it before step 1 makes
+   Pages redirect to a domain that does not resolve, taking the site down at both
+   addresses. There is deliberately no `CNAME` in this repo yet.
+3. Only once the domain serves the page, rewrite the URLs:
+
+```bash
+grep -rl "noluyorabi.github.io/cockpit-claude" site/ docs/ *.md package.json .github/ \
+  | xargs sed -i '' 's|https://noluyorabi.github.io/cockpit-claude|https://cockpit.js.org|g'
+```
+
+Then re-check `site/sitemap.xml`, the `<link rel="canonical">` and the JSON-LD block,
+and run `curl -sI <domain>` to confirm it is a 200 rather than a redirect chain.
 
 ## Comments (giscus)
 

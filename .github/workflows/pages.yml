@@ -31,6 +31,11 @@ jobs:
           # later in the job for no benefit.
           persist-credentials: false
       - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+        with:
+          # Turn Pages on rather than failing when it is off. Without this the
+          # very first push to a fresh clone or fork fails, because the workflow
+          # runs before anyone has visited the Pages settings page.
+          enablement: true
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
         with:
           path: site

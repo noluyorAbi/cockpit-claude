@@ -32,4 +32,4 @@ Author: Alperen Adatepe (https://adatepe.dev), GitHub @noluyorAbi.
 
 ## Optional
 
-- [Website](https://cockpit.js.org/): includes a live simulation of the panel running the same projection maths.
+- [Website](https://noluyorabi.github.io/cockpit-claude/): includes a live simulation of the panel running the same projection maths.

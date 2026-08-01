@@ -35,7 +35,7 @@ First public release.
   existing `statusLine` entry before replacing it.
 - Dependency-free test suite covering malformed payloads, segment toggles, the
   auto-compact arithmetic and the projection edge cases.
-- Website at [cockpit.js.org](https://cockpit.js.org) with a live simulation of the
+- Website at [noluyorabi.github.io/cockpit-claude](https://noluyorabi.github.io/cockpit-claude) with a live simulation of the
   panel running the same projection maths as the statusline itself.
 
 ### Security

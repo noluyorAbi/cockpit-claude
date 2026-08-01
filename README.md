@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://cockpit.js.org">cockpit.js.org</a> ·
+  <a href="https://noluyorabi.github.io/cockpit-claude">Website</a> ·
   <a href="docs/CONFIG.md">Config</a> ·
   <a href="docs/FAQ.md">FAQ</a> ·
   <a href="docs/ROADMAP.md">Roadmap</a> ·
@@ -138,7 +138,7 @@ what the comment thread on the website reads from.
 Built something on top of this? A fork, an extra segment, a terminal theme, a port, a
 tool that reads the same numbers: open a
 [showcase issue](https://github.com/noluyorAbi/cockpit-claude/issues/new?template=showcase.yml)
-and it goes on [cockpit.js.org](https://cockpit.js.org/#community). You do not need to
+and it goes on [the website](https://noluyorabi.github.io/cockpit-claude/#community). You do not need to
 have contributed here first.
 
 ## The repo ledger segment
