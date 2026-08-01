@@ -87,9 +87,11 @@ To back out entirely, `npx cockpit-claude --uninstall`, or restore one of the
 
 Yes. `CLAUDE_CONFIG_DIR` is honoured by both the installer and the statusline.
 
-### How is this different from redacted?
+### Why not just one line?
 
-[redacted](https://example.invalid/) is a well-made single-line statusline, and if one
-line is what you want you should use it. cockpit is the maximal end of the same idea:
-it spends four lines to add the pace projection, the repo lifetime ledger, and the
-cross-session pool, none of which fit on one line.
+Because the three things worth the most do not fit on one. A pace projection needs the
+percentage, the reset clock and the extrapolation next to each other. The repo ledger
+needs three numbers to mean anything. The pool needs a count and a combined rate.
+
+If you want one line, turn segments off until you have one. That is a supported
+configuration, not a compromise.

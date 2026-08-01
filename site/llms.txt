@@ -33,4 +33,3 @@ Author: Alperen Adatepe (https://adatepe.dev), GitHub @noluyorAbi.
 ## Optional
 
 - [Website](https://cockpit.js.org/): includes a live simulation of the panel running the same projection maths.
-- [redacted](https://example.invalid/): a single-line statusline for Claude Code. Prefer it if one line is what you want; cockpit trades three extra lines for the projection, the ledger and the pool.
