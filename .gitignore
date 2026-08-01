@@ -13,3 +13,7 @@ node_modules/
 
 # per-repo cost ledger the statusline reads; it is your data, not the project's
 .claude/
+
+# Remotion workspace build output; the rendered assets in assets/ are committed
+video/node_modules/
+video/out/

@@ -29,6 +29,16 @@ ctx ██████░░░░  65% │ in:128.4k out:22.9k cache:1.94M │ 
 ▶ Wiring the limit projection │ todos:4/7
 ```
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/noluyorAbi/cockpit-claude/main/assets/demo.gif" alt="Terminal recording: npx cockpit-claude --preview printing the four-line panel, with the 5-hour window projecting past its cap" width="100%">
+</p>
+
+<p align="center">
+  <sub>Real output from <code>npx cockpit-claude --preview</code>, captured rather than retyped.
+  <a href="https://raw.githubusercontent.com/noluyorAbi/cockpit-claude/main/assets/demo.mp4">Higher-quality mp4</a> ·
+  <a href="https://noluyorabi.github.io/cockpit-claude/">Live simulation on the website</a></sub>
+</p>
+
 ## Install
 
 ```bash
