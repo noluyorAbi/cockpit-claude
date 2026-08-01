@@ -9,12 +9,12 @@ you touch anything.
 
 ## What it produces
 
-| Command              | Output              | Size at 1x                | Purpose                       |
-| -------------------- | ------------------- | ------------------------- | ----------------------------- |
-| `npm run render:mp4` | `../assets/demo.mp4` | 1920x1080, 30fps, h264   | linked from the README        |
-| `npm run render:gif` | `../assets/demo.gif` | 960x540, 15fps           | embedded inline in the README |
-| `npm run render:banner` | `../assets/banner.png` | 1584x396              | README hero, LinkedIn 4:1     |
-| `npm run render:social` | `../assets/social-card.png` | 1280x640         | GitHub social preview         |
+| Command                 | Output                      | Size at 1x             | Purpose                       |
+| ----------------------- | --------------------------- | ---------------------- | ----------------------------- |
+| `npm run render:mp4`    | `../assets/demo.mp4`        | 1920x1080, 30fps, h264 | linked from the README        |
+| `npm run render:gif`    | `../assets/demo.gif`        | 960x540, 15fps         | embedded inline in the README |
+| `npm run render:banner` | `../assets/banner.png`      | 1584x396               | README hero, LinkedIn 4:1     |
+| `npm run render:social` | `../assets/social-card.png` | 1280x640               | GitHub social preview         |
 
 `npm run build` runs all four, in about 31 seconds. Every path is relative to
 this directory, so the assets land in `<repo>/assets/`, next to `<repo>/video/`.
@@ -77,18 +77,18 @@ you verify the toolchain before writing anything.
 
 ## `src/content.ts` field by field
 
-| Field         | Required | Type                | Rule                                                                 |
-| ------------- | -------- | ------------------- | -------------------------------------------------------------------- |
-| `name`        | yes      | `string`            | The project name, exact casing. No tagline glued on.                  |
-| `tagline`     | yes      | `string`            | The promise. Under about 60 characters, ends in a period.             |
-| `description` | yes      | `string`            | One line of plain prose, under about 100 characters.                  |
-| `install`     | yes      | `string`            | The one command, no leading `$`.                                      |
-| `repoUrl`     | yes      | `string`            | `github.com/user/repo`. No scheme, no trailing slash.                 |
+| Field         | Required | Type                | Rule                                                                                |
+| ------------- | -------- | ------------------- | ----------------------------------------------------------------------------------- |
+| `name`        | yes      | `string`            | The project name, exact casing. No tagline glued on.                                |
+| `tagline`     | yes      | `string`            | The promise. Under about 60 characters, ends in a period.                           |
+| `description` | yes      | `string`            | One line of plain prose, under about 100 characters.                                |
+| `install`     | yes      | `string`            | The one command, no leading `$`.                                                    |
+| `repoUrl`     | yes      | `string`            | `github.com/user/repo`. No scheme, no trailing slash.                               |
 | `accent`      | no       | `string`            | Hex. Defaults to the Claude coral `#d97757`. Override only for a real brand colour. |
-| `highlights`  | no       | `string[]`          | Two to four short, checkable claims. Banner only.                     |
-| `coldOpen`    | no       | `string[]`          | At most three opening lines, each under about 42 characters.          |
-| `windowTitle` | no       | `string`            | Title bar label. Defaults to `name`.                                  |
-| `demo`        | yes      | discriminated union | `{kind: "terminal", ...}` or `{kind: "screens", ...}`. See below.     |
+| `highlights`  | no       | `string[]`          | Two to four short, checkable claims. Banner only.                                   |
+| `coldOpen`    | no       | `string[]`          | At most three opening lines, each under about 42 characters.                        |
+| `windowTitle` | no       | `string`            | Title bar label. Defaults to `name`.                                                |
+| `demo`        | yes      | discriminated union | `{kind: "terminal", ...}` or `{kind: "screens", ...}`. See below.                   |
 
 ### Writing the tagline
 
@@ -127,11 +127,11 @@ omit the field.
 
 Pick the one that shows the product doing its job in the fewest seconds.
 
-| The project is                       | Use                 |
-| ------------------------------------ | ------------------- |
-| a CLI, a script, a git tool, an MCP server, anything whose output is text | `kind: "terminal"` |
-| a web app, a dashboard, a browser extension, anything with a UI | `kind: "screens"` |
-| a library with no UI and no CLI      | `kind: "terminal"`, showing the test suite or a REPL session running against it |
+| The project is                                                            | Use                                                                             |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| a CLI, a script, a git tool, an MCP server, anything whose output is text | `kind: "terminal"`                                                              |
+| a web app, a dashboard, a browser extension, anything with a UI           | `kind: "screens"`                                                               |
+| a library with no UI and no CLI                                           | `kind: "terminal"`, showing the test suite or a REPL session running against it |
 
 Both modes render inside the same window chrome, share the same cold open, and
 share the same end card. Only the middle of the video differs.
@@ -247,14 +247,14 @@ npm run build          # all four assets
 
 Measured on an Apple Silicon Mac, 536-frame video, warm cache:
 
-| Step               | Wall time | Output size |
-| ------------------ | --------- | ----------- |
-| `npm install`      | 12 s      | 293 packages |
-| `npm run typecheck`| 2 s       |             |
-| `npm run render:banner` | 1.9 s | 294 KB      |
-| `npm run render:social` | 1.7 s | 321 KB      |
-| `npm run render:mp4`    | 14 s  | 1.1 MB      |
-| `npm run render:gif`    | 10 s  | 1.2 MB      |
+| Step                    | Wall time | Output size  |
+| ----------------------- | --------- | ------------ |
+| `npm install`           | 12 s      | 293 packages |
+| `npm run typecheck`     | 2 s       |              |
+| `npm run render:banner` | 1.9 s     | 294 KB       |
+| `npm run render:social` | 1.7 s     | 321 KB       |
+| `npm run render:mp4`    | 14 s      | 1.1 MB       |
+| `npm run render:gif`    | 10 s      | 1.2 MB       |
 
 The first render on a fresh machine also downloads Chrome Headless Shell
 (93.5 MB, once). That is silent and looks exactly like a hang, so run
@@ -354,19 +354,31 @@ import type { Content } from "./content-types";
 export const content: Content = {
   name: "Sweep",
   tagline: "Every dead asset in your repo, found and gone.",
-  description: "Scans a repo for unreferenced images, fonts and CSS, then removes them.",
+  description:
+    "Scans a repo for unreferenced images, fonts and CSS, then removes them.",
   install: "npx sweep .",
   repoUrl: "github.com/noluyorAbi/sweep",
   accent: "#d97757",
   highlights: ["dry run by default", "no config", "MIT"],
-  coldOpen: ["400 files in /assets.", "Nobody knows which ones ship.", "Find out in 4 seconds."],
+  coldOpen: [
+    "400 files in /assets.",
+    "Nobody knows which ones ship.",
+    "Find out in 4 seconds.",
+  ],
   windowTitle: "sweep",
   demo: {
     kind: "screens",
     shots: [
       { src: "screens/01-scan.png", caption: "Point it at a repo" },
-      { src: "screens/02-report.png", caption: "Every unreferenced file, with its size" },
-      { src: "screens/03-clean.png", caption: "One flag to remove them", holdFrames: 120 },
+      {
+        src: "screens/02-report.png",
+        caption: "Every unreferenced file, with its size",
+      },
+      {
+        src: "screens/03-clean.png",
+        caption: "One flag to remove them",
+        holdFrames: 120,
+      },
     ],
   },
 };

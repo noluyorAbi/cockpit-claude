@@ -25,7 +25,11 @@ export const content: Content = {
   repoUrl: "github.com/noluyorAbi/cockpit-claude",
   accent: "#dfa440",
   highlights: ["zero deps", "no network", "MIT"],
-  coldOpen: ["Four terminals open.", "One rate limit.", "Which one is burning it?"],
+  coldOpen: [
+    "Four terminals open.",
+    "One rate limit.",
+    "Which one is burning it?",
+  ],
   windowTitle: "claude \u00b7 cockpit",
   demo: {
     kind: "terminal",
