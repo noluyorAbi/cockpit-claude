@@ -8,7 +8,7 @@
    =========================================================================== */
 
 :root {
-  /* Three surfaces, four text levels, hairline rules. Depth comes from surface
+  /* Three surfaces, three text levels, hairline rules. Depth comes from surface
      tint and a 1px border, never from a shadow: this is a developer tool, and a
      flat, dense surface reads as precision rather than as a floating card. */
 
@@ -17,7 +17,6 @@
   --d-surface:   #131210;
   --d-raised:    #191713;
   --d-ink:       #ece8dd;
-  --d-secondary: #bdb7a8;
   --d-muted:     #948e80;
   --d-faint:     #6b6659;
   --d-rule:      rgba(236, 232, 221, 0.12);
@@ -32,7 +31,6 @@
   --surface:    #ebe8dd;
   --raised:     #f8f6f0;
   --ink:        #16150f;
-  --secondary:  #423e34;
   --muted:      #6b6658;
   --faint:      #a49d8c;
   --rule:       rgba(22, 21, 15, 0.10);
@@ -48,9 +46,8 @@
   --r-lg:  12px;
   --r-pill: 999px;
 
-  /* Content column. The terminal panel is allowed to run wider than prose. */
+  /* Content column. */
   --col:      1120px;
-  --col-wide: 1280px;
   --gutter:   clamp(20px, 5vw, 56px);
 
   /* the terminal keeps its own palette in both themes */
@@ -87,7 +84,7 @@
   :root:not([data-theme="light"]) {
     --paper: var(--d-paper);           --surface: var(--d-surface);
     --raised: var(--d-raised);         --ink: var(--d-ink);
-    --secondary: var(--d-secondary);   --muted: var(--d-muted);
+    --muted: var(--d-muted);
     --faint: var(--d-faint);           --rule: var(--d-rule);
     --rule-soft: var(--d-rule-soft);   --accent: var(--d-accent);
     --accent-ink: var(--d-accent-ink); --hot: var(--d-hot);
@@ -98,7 +95,7 @@
 :root[data-theme="dark"] {
   --paper: var(--d-paper);           --surface: var(--d-surface);
   --raised: var(--d-raised);         --ink: var(--d-ink);
-  --secondary: var(--d-secondary);   --muted: var(--d-muted);
+  --muted: var(--d-muted);
   --faint: var(--d-faint);           --rule: var(--d-rule);
   --rule-soft: var(--d-rule-soft);   --accent: var(--d-accent);
   --accent-ink: var(--d-accent-ink); --hot: var(--d-hot);
