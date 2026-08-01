@@ -1,9 +1,12 @@
 /* ===========================================================================
    cockpit · claude / site behaviour
+
    The hero panel is a real simulation, not a video: the same thresholds and
    the same pace projection the installed statusline uses, running on a
-   compressed session clock. Watching it long enough shows the whole arc,
-   including auto-compact firing and the 5h window going hot.
+   compressed session clock you can pause and scrub.
+
+   Motion budget: interactive things move in under 300ms with a strong
+   ease-out; only scroll reveals run longer, because those are explanatory.
    =========================================================================== */
 
 const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -81,12 +84,8 @@ function el(tag, cls, text) {
 
 // Only touch the DOM when the value actually changed. Keeps the panel from
 // thrashing 60 times a second and keeps text selection alive.
-function setText(node, text) {
-  if (node.textContent !== text) node.textContent = text;
-}
-function setCls(node, cls) {
-  if (node.className !== cls) node.className = cls;
-}
+function setText(node, text) { if (node.textContent !== text) node.textContent = text; }
+function setCls(node, cls) { if (node.className !== cls) node.className = cls; }
 
 /* --- fit the panel to its container ---------------------------------------- */
 /* The panel's whole argument is density, so it must not truncate. Shrink the
@@ -98,7 +97,6 @@ const FIT_MAX = 13.5, FIT_MIN = 8.5, FIT_STEP = 0.25;
 function fitPanel(node) {
   let size = FIT_MAX;
   node.style.fontSize = size + "px";
-  // scrollWidth reflects the widest pre-formatted line
   let guard = Math.ceil((FIT_MAX - FIT_MIN) / FIT_STEP) + 1;
   while (node.scrollWidth > node.clientWidth + 1 && size > FIT_MIN && guard-- > 0) {
     size -= FIT_STEP;
@@ -129,76 +127,55 @@ function makeFitter(node) {
 /* Order matters: it is the order the arrow keys walk. */
 
 const SIGNALS = [
-  {
-    id: "model", name: "Model + effort",
-    sample: "Opus 5 (1M) ·high",
-    text: "Which model you are actually on, and the reasoning effort you last set. When the 5-hour window starts projecting past its cap, this badge turns red and adds ↓ease, because nothing else can downshift effort for you.",
-  },
-  {
-    id: "style", name: "Output style",
-    sample: "style:default",
-    text: "The active output style. Easy to forget you left one on three sessions ago and then wonder why the tone changed.",
-  },
-  {
-    id: "cwd", name: "Working directory",
-    sample: "▸ ~/repos/cockpit-claude",
-    text: "Home-relative working directory. Across six terminals this is the fastest way to answer \"which one is this\".",
-  },
-  {
-    id: "git", name: "Git state",
-    sample: "⎇ main [~3 +1] ↑2",
-    text: "Branch, then the working tree: ~modified, +added or untracked, -deleted, or a green ✓ when clean. ↑ and ↓ are commits ahead of and behind upstream.",
-  },
-  {
-    id: "ctx", name: "Usable context",
-    sample: "ctx ██████░░░░  65%",
-    text: "Not raw context: usable context. Auto-compact fires with a buffer still on the clock, so the buffer is subtracted first. 100% here means compaction, not an empty window. Green under 50, then yellow, orange, and blinking red past 80.",
-  },
-  {
-    id: "tokens", name: "Token split",
-    sample: "in:128.4k out:22.9k cache:1.94M",
-    text: "Input, output, and cached input for the session. A cache number far above input is the sign that prompt caching is doing its job.",
-  },
-  {
-    id: "cost", name: "Session spend + burn",
-    sample: "$4.82   ⌁$6.9/hr",
-    text: "What this session has cost, and the rate it is spending at. The rate is the useful half: $6.90/hr tells you what the next hour costs if you keep going exactly like this.",
-  },
-  {
-    id: "ledger", name: "Repo lifetime",
-    sample: "repo Σ$1,284 · time 96h · 37×",
-    text: "Read from this repo's own cost ledger: everything ever spent here, total active time, and how many sessions it took. Σ is the signature number; the × marks a tally so it never reads as a unit of time.",
-  },
-  {
-    id: "churn", name: "Line churn",
-    sample: "+318/-74",
-    text: "Lines added and removed this session. A quiet sanity check on whether an hour of spend actually moved any code.",
-  },
-  {
-    id: "limit5", name: "5-hour window",
-    sample: "5h ▰▰▰▰▰▱▱▱ 62% ↻2h15m ⚡cap~1h41m",
-    text: "Percentage used, time until reset, and where your current pace lands. →84% is a projection of the end of the window. ⚡cap~1h41m replaces it when the projection goes past 100%: that is the clock until you are cut off.",
-  },
-  {
-    id: "limit7", name: "7-day window",
-    sample: "7d ▰▰▱▱▱▱▱▱ 31% ↻2d14h →49%",
-    text: "The same treatment for the weekly allowance. It moves slowly, which is exactly why a projection is worth more here than a raw number.",
-  },
-  {
-    id: "pool", name: "Cross-session pool",
-    sample: "pool 5 live ⌁Σ$31/hr",
-    text: "How many Claude Code sessions are burning your shared limit right now, and their combined rate. Every cockpit heartbeats to one temp directory, so each panel can see the fleet. This is the number no single window can work out on its own.",
-  },
-  {
-    id: "task", name: "Active task",
-    sample: "▶ Wiring the limit projection",
-    text: "The in-progress item from the current todo list, so a long tool run always says what it is in the middle of.",
-  },
-  {
-    id: "todos", name: "Todo progress",
-    sample: "todos:4/7",
-    text: "Completed over total for the active list. Pairs with the task above: what it is doing, and how much is left.",
-  },
+  { id: "model", name: "Model + effort", sample: "Opus 5 (1M) ·high",
+    text: "Which model you are actually on, and the reasoning effort you last set. When the 5-hour window starts projecting past its cap, this badge turns red and adds ↓ease, because nothing else can downshift effort for you." },
+  { id: "style", name: "Output style", sample: "style:default",
+    text: "The active output style. Easy to forget you left one on three sessions ago and then wonder why the tone changed." },
+  { id: "cwd", name: "Working directory", sample: "▸ ~/repos/cockpit-claude",
+    text: "Home-relative working directory. Across six terminals this is the fastest way to answer \"which one is this\"." },
+  { id: "git", name: "Git state", sample: "⎇ main [~3 +1] ↑2",
+    text: "Branch, then the working tree: ~modified, +added or untracked, -deleted, or a green ✓ when clean. ↑ and ↓ are commits ahead of and behind upstream." },
+  { id: "ctx", name: "Usable context", sample: "ctx ██████░░░░  65%",
+    text: "Not raw context: usable context. Auto-compact fires with a buffer still on the clock, so the buffer is subtracted first. 100% here means compaction, not an empty window. Green under 50, then yellow, orange, and blinking red past 80." },
+  { id: "tokens", name: "Token split", sample: "in:128.4k out:22.9k cache:1.94M",
+    text: "Input, output, and cached input for the session. A cache number far above input is the sign that prompt caching is doing its job." },
+  { id: "cost", name: "Session spend + burn", sample: "$4.82   ⌁$6.9/hr",
+    text: "What this session has cost, and the rate it is spending at. The rate is the useful half: $6.90/hr tells you what the next hour costs if you keep going exactly like this." },
+  { id: "ledger", name: "Repo lifetime", sample: "repo Σ$1,284 · time 96h · 37×",
+    text: "Read from this repo's own cost ledger: everything ever spent here, total active time, and how many sessions it took. Σ is the signature number; the × marks a tally so it never reads as a unit of time." },
+  { id: "churn", name: "Line churn", sample: "+318/-74",
+    text: "Lines added and removed this session. A quiet sanity check on whether an hour of spend actually moved any code." },
+  { id: "limit5", name: "5-hour window", sample: "5h ▰▰▰▰▰▱▱▱ 62% ↻2h15m ⚡cap~1h41m",
+    text: "Percentage used, time until reset, and where your current pace lands. →84% is a projection of the end of the window. ⚡cap~1h41m replaces it when the projection goes past 100%: that is the clock until you are cut off." },
+  { id: "limit7", name: "7-day window", sample: "7d ▰▰▱▱▱▱▱▱ 31% ↻2d14h →49%",
+    text: "The same treatment for the weekly allowance. It moves slowly, which is exactly why a projection is worth more here than a raw number." },
+  { id: "pool", name: "Cross-session pool", sample: "pool 5 live ⌁Σ$31/hr",
+    text: "How many Claude Code sessions are burning your shared limit right now, and their combined rate. Every cockpit heartbeats to one temp directory, so each panel can see the fleet. This is the number no single window can work out on its own." },
+  { id: "task", name: "Active task", sample: "▶ Wiring the limit projection",
+    text: "The in-progress item from the current todo list, so a long tool run always says what it is in the middle of." },
+  { id: "todos", name: "Todo progress", sample: "todos:4/7",
+    text: "Completed over total for the active list. Pairs with the task above: what it is doing, and how much is left." },
+];
+
+/* --- roadmap --------------------------------------------------------------- */
+/* The honest list of what cockpit cannot do yet. Kept here rather than in
+   markup so it stays one edit away from being a contribution prompt. */
+
+const ROADMAP = [
+  { title: "Per-project config", tag: "help wanted",
+    why: "One global file today. A <repo>/.claude/cockpit.config.json overlay would let a monorepo drop the git segment without touching everything else." },
+  { title: "Write its own ledger", tag: "help wanted",
+    why: "The repo Σ$ segment reads a CSV that another tool has to produce. A small writer hook would make that segment work out of the box." },
+  { title: "Configurable segment order", tag: "help wanted",
+    why: "Segments can be turned off but not moved. An ordered array per line would fix that without changing any reader." },
+  { title: "cockpit doctor", tag: "idea",
+    why: "A subcommand that prints the payload it actually received, which config file won, and why a given segment is hiding." },
+  { title: "Burn sparkline", tag: "idea",
+    why: "The pool heartbeats already carry a burn rate. Keeping the last N would give the spend a shape instead of a single number." },
+  { title: "ASCII-only glyph mode", tag: "idea",
+    why: "The bar blocks, the branch mark and the lightning bolt all assume a capable font. A flag that swaps in plain ASCII would make cockpit safe over an old SSH session or a bare console." },
+  { title: "A --json mode", tag: "idea",
+    why: "Everything the panel computes is useful to other tools. Emitting the same values as JSON would let people build on it without re-deriving the maths." },
 ];
 
 /* --- panel construction ---------------------------------------------------- */
@@ -208,11 +185,7 @@ function buildPanel(root, { interactive = false } = {}) {
   const refs = {};
   const segs = new Map();
 
-  const line = () => {
-    const d = el("div", "pline");
-    root.appendChild(d);
-    return d;
-  };
+  const line = () => { const d = el("div", "pline"); root.appendChild(d); return d; };
   const sep = (parent, s = " │ ") => parent.appendChild(el("span", "c-dim", s));
   const seg = (parent, id) => {
     const s = el("span", "seg");
@@ -224,31 +197,28 @@ function buildPanel(root, { interactive = false } = {}) {
   };
   const part = (parent, cls, text) => parent.appendChild(el("span", cls, text));
 
-  // ── line 1: identity
+  // line 1: identity
   const l1 = line();
   const sModel = seg(l1, "model");
   refs.model = part(sModel, "c-magenta bold", "Opus 5 (1M)");
   refs.effort = part(sModel, "c-dim", " ·high");
   sep(l1);
-  const sStyle = seg(l1, "style");
-  part(sStyle, "c-cyan", "style:default");
+  part(seg(l1, "style"), "c-cyan", "style:default");
   sep(l1);
-  const sCwd = seg(l1, "cwd");
-  part(sCwd, "c-bcyan", "▸ ~/repos/cockpit-claude");
+  part(seg(l1, "cwd"), "c-bcyan", "▸ ~/repos/cockpit-claude");
   part(l1, null, " ");
   const sGit = seg(l1, "git");
   part(sGit, "c-cyan", "⎇ main");
   refs.gitStatus = part(sGit, "c-yellow", " [~3 +1]");
   part(sGit, "c-cyan", " ↑2");
 
-  // ── line 2: resources
+  // line 2: resources
   const l2 = line();
   const sCtx = seg(l2, "ctx");
   part(sCtx, "c-dim", "ctx ");
   refs.ctxBar = part(sCtx, "c-green", "");
   sep(l2);
-  const sTok = seg(l2, "tokens");
-  refs.tokens = part(sTok, "c-gray", "");
+  refs.tokens = part(seg(l2, "tokens"), "c-gray", "");
   sep(l2);
   const sCost = seg(l2, "cost");
   refs.cost = part(sCost, "c-green", "");
@@ -267,7 +237,7 @@ function buildPanel(root, { interactive = false } = {}) {
   part(sChurn, null, "/");
   refs.rm = part(sChurn, "c-red", "-74");
 
-  // ── line 3: limits
+  // line 3: limits
   const l3 = line();
   part(l3, "c-dim", "◷ limits  ");
   const s5 = seg(l3, "limit5");
@@ -289,13 +259,11 @@ function buildPanel(root, { interactive = false } = {}) {
   refs.pool = part(sPool, "c-green", "");
   refs.poolBurn = part(sPool, "c-dim", "");
 
-  // ── line 4: work
+  // line 4: work
   const l4 = line();
-  const sTask = seg(l4, "task");
-  refs.task = part(sTask, "bold", "▶ Wiring the limit projection");
+  refs.task = part(seg(l4, "task"), "bold", "▶ Wiring the limit projection");
   sep(l4);
-  const sTodo = seg(l4, "todos");
-  refs.todos = part(sTodo, "c-dim", "todos:4/7");
+  refs.todos = part(seg(l4, "todos"), "c-dim", "todos:4/7");
 
   return { root, refs, segs };
 }
@@ -305,20 +273,12 @@ function buildPanel(root, { interactive = false } = {}) {
 function paint(panel, s) {
   const { refs } = panel;
 
-  // effort badge escalates exactly the way the shipped statusline does
   const p5 = projectLimit(s.five, s.fiveResetIn, 5 * 3600);
   const danger = !!(p5 && p5.capEtaSecs != null);
   const warn = s.five >= 85;
-  if (danger) {
-    setText(refs.effort, " ·high ↓ease");
-    setCls(refs.effort, "c-red bold");
-  } else if (warn) {
-    setText(refs.effort, " ·high");
-    setCls(refs.effort, "c-orange");
-  } else {
-    setText(refs.effort, " ·high");
-    setCls(refs.effort, "c-dim");
-  }
+  if (danger) { setText(refs.effort, " ·high ↓ease"); setCls(refs.effort, "c-red bold"); }
+  else if (warn) { setText(refs.effort, " ·high"); setCls(refs.effort, "c-orange"); }
+  else { setText(refs.effort, " ·high"); setCls(refs.effort, "c-dim"); }
 
   const ctxPct = Math.round(s.ctx);
   setText(refs.ctxBar, `${bar(ctxPct, 10, "█", "░")} ${fixWR(ctxPct, 3)}%`);
@@ -330,24 +290,16 @@ function paint(panel, s) {
   setText(refs.add, `+${s.add}`);
   setText(refs.rm, `-${s.rm}`);
 
-  // 5h cell
   const c5 = limitColor(s.five);
   setText(refs.b5, bar(s.five, 8, "▰", "▱") + " ");
   setCls(refs.b5, c5);
   setText(refs.p5, `${fixWR(Math.round(s.five), 2)}%`);
   setCls(refs.p5, c5);
   setText(refs.r5, ` ↻${fmtDur(s.fiveResetIn)}`);
-  if (danger) {
-    setText(refs.j5, ` ⚡cap~${fmtDur(p5.capEtaSecs)}`);
-    setCls(refs.j5, "c-red bold");
-  } else if (p5 && p5.proj > 0) {
-    setText(refs.j5, ` →${p5.proj}%`);
-    setCls(refs.j5, limitColor(Math.min(p5.proj, 100)));
-  } else {
-    setText(refs.j5, "");
-  }
+  if (danger) { setText(refs.j5, ` ⚡cap~${fmtDur(p5.capEtaSecs)}`); setCls(refs.j5, "c-red bold"); }
+  else if (p5 && p5.proj > 0) { setText(refs.j5, ` →${p5.proj}%`); setCls(refs.j5, limitColor(Math.min(p5.proj, 100))); }
+  else setText(refs.j5, "");
 
-  // 7d cell
   const c7 = limitColor(s.seven);
   const p7 = projectLimit(s.seven, s.sevenResetIn, 7 * 86400);
   setText(refs.b7, bar(s.seven, 8, "▰", "▱") + " ");
@@ -355,12 +307,8 @@ function paint(panel, s) {
   setText(refs.p7, `${fixWR(Math.round(s.seven), 2)}%`);
   setCls(refs.p7, c7);
   setText(refs.r7, ` ↻${fmtDur(s.sevenResetIn)}`);
-  if (p7 && p7.proj > 0) {
-    setText(refs.j7, ` →${p7.proj}%`);
-    setCls(refs.j7, limitColor(Math.min(p7.proj, 100)));
-  } else {
-    setText(refs.j7, "");
-  }
+  if (p7 && p7.proj > 0) { setText(refs.j7, ` →${p7.proj}%`); setCls(refs.j7, limitColor(Math.min(p7.proj, 100))); }
+  else setText(refs.j7, "");
 
   const poolCls = s.pool < 3 ? "c-green" : s.pool < 6 ? "c-yellow" : s.pool < 9 ? "c-orange" : "c-red";
   setText(refs.pool, `${s.pool} live`);
@@ -402,6 +350,7 @@ function simulate(p, spike) {
   // going hot should be an event you watch happen, not the resting state.
   const five = Math.min(99, 18 + p * 66 + p * p * 14 + spike * 26);
   const fiveResetIn = Math.round(3 * 3600 - p * 9300);
+
   // The weekly window is already well into its cycle: roughly four and a half
   // days elapsed. Anything else makes the projection arithmetic look absurd,
   // because a tiny elapsed fraction extrapolates to hundreds of percent.
@@ -409,21 +358,17 @@ function simulate(p, spike) {
   const sevenResetIn = Math.round((2.6 - p * 0.06) * 86400);
 
   const poolCurve = [2, 2, 3, 4, 5, 5, 4, 3];
-  const pool = poolCurve[Math.floor(p * poolCurve.length)] + (spike ? 2 : 0);
+  const pool = poolCurve[Math.min(poolCurve.length - 1, Math.floor(p * poolCurve.length))] + (spike ? 2 : 0);
 
   return {
     ctx,
     inTok: 18_000 + p * 142_000,
     outTok: 2_400 + p * 26_000,
     cache: 180_000 + p * 2_100_000,
-    cost,
-    burn,
+    cost, burn,
     add: Math.round(24 + p * 402),
     rm: Math.round(4 + p * 96),
-    five,
-    fiveResetIn,
-    seven,
-    sevenResetIn,
+    five, fiveResetIn, seven, sevenResetIn,
     pool,
     poolBurn: burn * pool * 0.82,
     task: TASKS[Math.min(TASKS.length - 1, Math.floor(p * TASKS.length))],
@@ -443,15 +388,102 @@ function narrate(s, flags, spike) {
   return "Ordinary working session. Everything is where it should be.";
 }
 
+/* --- theme ----------------------------------------------------------------- */
+/* Three states, because "follow the OS" is a real preference and not the same
+   thing as picking light. Stored, and broadcast so giscus can follow along. */
+
+const THEMES = ["system", "light", "dark"];
+const THEME_ICON = { system: "◐", light: "○", dark: "●" };
+const themeListeners = new Set();
+
+function storedTheme() {
+  try { return localStorage.getItem("cockpit-theme") || "system"; } catch { return "system"; }
+}
+
+function resolvedTheme(mode) {
+  if (mode !== "system") return mode;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function applyTheme(mode) {
+  const root = document.documentElement;
+  if (mode === "system") root.removeAttribute("data-theme");
+  else root.setAttribute("data-theme", mode);
+  try { localStorage.setItem("cockpit-theme", mode); } catch {}
+  themeListeners.forEach((fn) => fn(resolvedTheme(mode)));
+}
+
 /* --- boot ------------------------------------------------------------------ */
 
 document.addEventListener("DOMContentLoaded", () => {
+
+  /* ── theme ─────────────────────────────────────────────────────────── */
+  let themeMode = storedTheme();
+  const themeBtn = document.getElementById("theme");
+  const themeIcon = document.getElementById("themeIcon");
+  const themeName = document.getElementById("themeName");
+
+  function renderTheme() {
+    themeIcon.textContent = THEME_ICON[themeMode];
+    themeName.textContent = themeMode.toUpperCase();
+    themeBtn.setAttribute("aria-label", `Colour theme: ${themeMode}. Click to change.`);
+  }
+  function cycleTheme() {
+    themeMode = THEMES[(THEMES.indexOf(themeMode) + 1) % THEMES.length];
+    applyTheme(themeMode);
+    renderTheme();
+    return themeMode;
+  }
+  applyTheme(themeMode);
+  renderTheme();
+  themeBtn.addEventListener("click", cycleTheme);
+  // Following the OS means following it as it changes, not just at load.
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+    if (themeMode === "system") themeListeners.forEach((fn) => fn(resolvedTheme("system")));
+  });
+
+  /* ── toast ─────────────────────────────────────────────────────────── */
+  const toast = el("div", "toast");
+  toast.setAttribute("role", "status");
+  document.body.appendChild(toast);
+  let toastTimer;
+  function say(msg) {
+    toast.textContent = msg;
+    toast.classList.add("on");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove("on"), 1600);
+  }
+
+  /* ── keyboard ──────────────────────────────────────────────────────── */
+  document.addEventListener("keydown", (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const t = e.target;
+    if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+    if (e.key === "t" || e.key === "T") say(`Theme: ${cycleTheme()}`);
+  });
+
+  /* ── scroll progress ───────────────────────────────────────────────── */
+  const progress = document.getElementById("progress");
+  const onProgress = () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    progress.style.transform = `scaleX(${max > 0 ? window.scrollY / max : 0})`;
+  };
+
+  /* ── hero panel ────────────────────────────────────────────────────── */
   const panelRoot = document.getElementById("panel");
   const narration = document.getElementById("narration");
   const wrap = panelRoot.closest(".panel-wrap");
   const live = buildPanel(panelRoot);
   const refitLive = makeFitter(panelRoot);
 
+  const scrub = document.getElementById("scrub");
+  const playBtn = document.getElementById("playBtn");
+  const playIcon = document.getElementById("playIcon");
+  const clock = document.getElementById("clock");
+  const liveTag = document.getElementById("liveTag");
+
+  let progressP = 0;          // 0..1 through the simulated arc
+  let playing = !reduced;
   let spikeUntil = 0;
   let lastNarration = "";
   let lastLen = -1;
@@ -463,44 +495,72 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
       narration.innerHTML = html;
       narration.classList.remove("swap");
-    }, 200);
+    }, 160);
   }
 
-  // A frozen, representative frame for anyone who asked not to be animated at.
-  if (reduced) {
-    const s = simulate(0.62, 0);
+  // Clock reads the elapsed side of the 5h window the panel is showing, so the
+  // transport and the limit bar are describing the same thing.
+  function renderClock(s) {
+    const elapsed = 18000 - s.fiveResetIn;
+    const hh = String(Math.floor(elapsed / 3600)).padStart(2, "0");
+    const mm = String(Math.floor((elapsed % 3600) / 60)).padStart(2, "0");
+    clock.textContent = `${hh}:${mm} / 05:00`;
+  }
+
+  function frame(spike) {
+    const s = simulate(progressP, spike);
     const flags = paint(live, s);
-    refitLive();
-    narration.innerHTML = narrate(s, flags, 0);
-    document.getElementById("liveTag").textContent = "PAUSED";
-  } else {
-    const t0 = performance.now();
-    const tick = (now) => {
-      const spike = now < spikeUntil ? 1 : 0;
-      const p = (((now - t0) / 1000) % LOOP) / LOOP;
-      const s = simulate(p, spike);
-      const flags = paint(live, s);
-      wrap.classList.toggle("hot", flags.danger);
-      setNarration(narrate(s, flags, spike));
-      // Only remeasure when the rendered text actually changed length; a
-      // fit pass costs layout, and most frames change colour, not width.
-      const len = panelRoot.textContent.length;
-      if (len !== lastLen) { lastLen = len; refitLive(); }
-      requestAnimationFrame(tick);
-    };
+    wrap.classList.toggle("hot", flags.danger);
+    setNarration(narrate(s, flags, spike));
+    renderClock(s);
+    scrub.value = String(Math.round(progressP * 1000));
+    scrub.style.setProperty("--fill", `${progressP * 100}%`);
+    const len = panelRoot.textContent.length;
+    if (len !== lastLen) { lastLen = len; refitLive(); }
+  }
+
+  function setPlaying(on) {
+    playing = on;
+    playIcon.textContent = on ? "❚❚" : "▶";
+    playBtn.setAttribute("aria-label", on ? "Pause the simulation" : "Play the simulation");
+    liveTag.textContent = on ? "LIVE" : "PAUSED";
+    liveTag.classList.toggle("paused", !on);
+  }
+
+  let last = performance.now();
+  function tick(now) {
+    const dt = (now - last) / 1000;
+    last = now;
+    if (playing) progressP = (progressP + dt / LOOP) % 1;
+    frame(now < spikeUntil ? 1 : 0);
     requestAnimationFrame(tick);
   }
 
-  /* beacon: the one hidden control on the page */
+  setPlaying(!reduced);
+  if (reduced) {
+    // A frozen, representative frame for anyone who asked not to be animated at.
+    progressP = 0.62;
+    frame(0);
+  } else {
+    requestAnimationFrame(tick);
+  }
+
+  playBtn.addEventListener("click", () => setPlaying(!playing));
+  scrub.addEventListener("input", () => {
+    setPlaying(false);
+    progressP = Number(scrub.value) / 1000;
+    frame(0);
+  });
+
   const beacon = document.getElementById("beacon");
   beacon.addEventListener("click", () => {
     spikeUntil = performance.now() + 6500;
+    setPlaying(true);
     beacon.classList.add("armed");
     setTimeout(() => beacon.classList.remove("armed"), 6500);
   });
 
-  /* --- inspector ---------------------------------------------------------- */
-
+  /* ── inspector ─────────────────────────────────────────────────────── */
   const staticRoot = document.getElementById("staticPanel");
   const detail = document.getElementById("detail");
   const insp = buildPanel(staticRoot, { interactive: true });
@@ -516,7 +576,6 @@ document.addEventListener("DOMContentLoaded", () => {
     current = SIGNALS.findIndex((s) => s.id === id);
     staticRoot.classList.add("inspecting");
     insp.segs.forEach((node, key) => node.classList.toggle("on", key === id));
-
     detail.textContent = "";
     const box = el("div", "detail-in");
     box.appendChild(el("p", "detail-name", sig.name));
@@ -524,7 +583,6 @@ document.addEventListener("DOMContentLoaded", () => {
     box.appendChild(el("p", "detail-text", sig.text));
     detail.appendChild(box);
   }
-
   function clear() {
     staticRoot.classList.remove("inspecting");
     insp.segs.forEach((node) => node.classList.remove("on"));
@@ -532,45 +590,248 @@ document.addEventListener("DOMContentLoaded", () => {
     detail.appendChild(el("p", "detail-idle", "Hover a segment to read it."));
     current = -1;
   }
-
   insp.segs.forEach((node, id) => {
     node.addEventListener("mouseenter", () => show(id));
     node.addEventListener("click", () => show(id));
   });
   staticRoot.addEventListener("mouseleave", clear);
-
   staticRoot.addEventListener("keydown", (e) => {
     if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
     e.preventDefault();
     const dir = e.key === "ArrowRight" ? 1 : -1;
-    const next = (current + dir + SIGNALS.length) % SIGNALS.length;
-    show(SIGNALS[next].id);
+    show(SIGNALS[(current + dir + SIGNALS.length) % SIGNALS.length].id);
   });
   staticRoot.addEventListener("focus", () => { if (current < 0) show(SIGNALS[0].id); });
 
-  /* --- copy --------------------------------------------------------------- */
+  /* ── the real-estate figure ────────────────────────────────────────── */
+  const estate = document.getElementById("estateTerm");
+  for (let i = 0; i < 24; i++) {
+    const row = el("div", "estate-row");
+    if (i >= 20) row.classList.add("used", `r${i - 19}`);
+    estate.appendChild(row);
+  }
+
+  /* ── roadmap ───────────────────────────────────────────────────────── */
+  const roadList = document.getElementById("roadList");
+  ROADMAP.forEach((item) => {
+    const a = el("a", "road");
+    a.href = "https://github.com/noluyorAbi/cockpit-claude/discussions";
+    a.appendChild(el("span", "road-box", "☐"));
+    const body = el("div", "road-body");
+    body.appendChild(el("h4", null, item.title));
+    body.appendChild(el("p", null, item.why));
+    a.appendChild(body);
+    a.appendChild(el("span", `road-tag${item.tag === "help wanted" ? " help" : ""}`, item.tag));
+    const li = el("li");
+    li.appendChild(a);
+    roadList.appendChild(li);
+  });
+
+  /* ── tabs ──────────────────────────────────────────────────────────── */
+  const tabs = [...document.querySelectorAll(".tab")];
+  const pill = document.getElementById("tabsPill");
+  const rail = pill.parentElement;
+  let activeTab = 0;
+
+  function movePill(instant) {
+    const t = tabs[activeTab];
+    if (instant) pill.classList.add("instant");
+    pill.style.setProperty("--x", `${t.offsetLeft}px`);
+    pill.style.setProperty("--w", `${t.offsetWidth}px`);
+    if (instant) requestAnimationFrame(() => pill.classList.remove("instant"));
+  }
+
+  function selectTab(i, { focus = false } = {}) {
+    const swap = () => {
+      tabs.forEach((t, n) => {
+        t.setAttribute("aria-selected", String(n === i));
+        t.tabIndex = n === i ? 0 : -1;
+        document.getElementById(t.getAttribute("aria-controls")).hidden = n !== i;
+      });
+      activeTab = i;
+      movePill(false);
+      if (i === 0) mountGiscus();
+      if (i === 1) mountShowcase();
+    };
+    // View Transitions give the pane swap a real crossfade for free where the
+    // browser supports it; everywhere else the CSS keyframe carries it.
+    if (!reduced && document.startViewTransition) document.startViewTransition(swap);
+    else swap();
+    if (focus) tabs[i].focus();
+  }
+
+  tabs.forEach((t, i) => {
+    t.tabIndex = i === 0 ? 0 : -1;
+    t.addEventListener("click", () => selectTab(i));
+    t.addEventListener("keydown", (e) => {
+      const map = { ArrowRight: 1, ArrowLeft: -1 };
+      if (!(e.key in map)) return;
+      e.preventDefault();
+      selectTab((i + map[e.key] + tabs.length) % tabs.length, { focus: true });
+    });
+  });
+  movePill(true);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => movePill(true));
+  window.addEventListener("resize", () => movePill(true), { passive: true });
+
+  /* ── giscus ────────────────────────────────────────────────────────── */
+  /* Comments are GitHub Discussions. Loaded on first view of the tab rather
+     than on page load: it is a third-party iframe and most visitors never
+     open it. Until the repo IDs are filled in it renders a plain link
+     instead of a broken widget. */
+
+  let giscusMounted = false;
+  function giscusTheme(resolved) {
+    return resolved === "dark" ? "dark_dimmed" : "light";
+  }
+
+  function mountGiscus() {
+    if (giscusMounted) return;
+    giscusMounted = true;
+    const host = document.getElementById("giscus");
+    let cfg = {};
+    try { cfg = JSON.parse(document.getElementById("giscus-config").textContent); } catch {}
+
+    const unconfigured = !cfg.repoId || String(cfg.repoId).startsWith("REPLACE_");
+    if (unconfigured) {
+      const box = el("div", "giscus-fallback");
+      box.appendChild(el("h4", null, "Comments are being wired up"));
+      box.appendChild(el("p", null,
+        "The in-page thread needs the repo's Discussions enabled and the giscus app installed. Until that lands, the conversation lives on GitHub, and every word of it is public."));
+      const a = el("a", "cta primary");
+      a.href = "https://github.com/noluyorAbi/cockpit-claude/discussions";
+      a.textContent = "Open the discussion on GitHub";
+      a.appendChild(el("span", null, "↗"));
+      box.appendChild(a);
+      host.appendChild(box);
+      return;
+    }
+
+    const s = document.createElement("script");
+    s.src = "https://giscus.app/client.js";
+    s.async = true;
+    s.crossOrigin = "anonymous";
+    Object.assign(s.dataset, {
+      repo: cfg.repo,
+      repoId: cfg.repoId,
+      category: cfg.category || "Ideas",
+      categoryId: cfg.categoryId,
+      mapping: "pathname",
+      strict: "0",
+      reactionsEnabled: "1",
+      emitMetadata: "0",
+      inputPosition: "top",
+      theme: giscusTheme(resolvedTheme(themeMode)),
+      lang: "en",
+      loading: "lazy",
+    });
+    host.appendChild(s);
+
+    themeListeners.add((resolved) => {
+      const frame = document.querySelector("iframe.giscus-frame");
+      if (!frame) return;
+      frame.contentWindow.postMessage(
+        { giscus: { setConfig: { theme: giscusTheme(resolved) } } },
+        "https://giscus.app",
+      );
+    });
+  }
+
+  /* ── showcase ──────────────────────────────────────────────────────── */
+
+  let showcaseMounted = false;
+  async function mountShowcase() {
+    if (showcaseMounted) return;
+    showcaseMounted = true;
+    const host = document.getElementById("showcase");
+
+    let items = [];
+    try {
+      const res = await fetch("showcase.json", { cache: "no-cache" });
+      if (res.ok) items = await res.json();
+    } catch {
+      // file:// or offline: an empty showcase is the correct thing to show
+    }
+
+    if (!Array.isArray(items) || items.length === 0) {
+      const box = el("div", "empty");
+      const art = el("div", "empty-art");
+      art.appendChild(el("span", "empty-box", "?"));
+      art.appendChild(el("span", "empty-arrow", "→"));
+      art.appendChild(el("span", null, "your thing here"));
+      box.appendChild(art);
+      box.appendChild(el("h4", null, "Nobody has shown their work yet"));
+      box.appendChild(el("p", null,
+        "Forks, extra segments, terminal themes, ports to other tools, anything that reads the same numbers. Be the first and this page stops being an empty state."));
+      const a = el("a", "cta primary");
+      a.href = "https://github.com/noluyorAbi/cockpit-claude/issues/new?template=showcase.yml";
+      a.textContent = "Show what you built";
+      a.appendChild(el("span", null, "↗"));
+      box.appendChild(a);
+      host.appendChild(box);
+      return;
+    }
+
+    const grid = el("div", "showcase-grid");
+    items.forEach((it) => {
+      const card = el("a", "showcase-card");
+      card.href = it.url;
+      card.rel = "noopener";
+      card.appendChild(el("span", "showcase-kind", it.kind || "project"));
+      card.appendChild(el("h4", null, it.name));
+      card.appendChild(el("p", null, it.description || ""));
+      card.appendChild(el("span", "showcase-by", `by ${it.author}`));
+      grid.appendChild(card);
+    });
+    host.appendChild(grid);
+
+    const add = el("a", "cta");
+    add.href = "https://github.com/noluyorAbi/cockpit-claude/issues/new?template=showcase.yml";
+    add.textContent = "Add yours";
+    add.appendChild(el("span", null, "↗"));
+    host.appendChild(add);
+  }
+
+  mountGiscus(); // the discussion tab is the one open on arrival
+
+  /* ── copy buttons ──────────────────────────────────────────────────── */
+
+  async function copy(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  function flash(btn, ok) {
+    const prev = btn.textContent;
+    btn.textContent = ok ? "COPIED" : "⌘C IT";
+    btn.classList.toggle("done", ok);
+    setTimeout(() => { btn.textContent = prev; btn.classList.remove("done"); }, 1600);
+  }
 
   const copyBtn = document.getElementById("copyBtn");
   const copyLabel = document.getElementById("copyLabel");
-  copyBtn.addEventListener("click", async () => {
-    try {
-      await navigator.clipboard.writeText("npx cockpit-claude");
-      copyLabel.textContent = "COPIED";
-      copyLabel.classList.add("done");
-    } catch {
-      copyLabel.textContent = "⌘C IT";
-    }
-    setTimeout(() => {
-      copyLabel.textContent = "COPY";
-      copyLabel.classList.remove("done");
-    }, 1800);
+  copyBtn.addEventListener("click", async () => flash(copyLabel, await copy("npx cockpit-claude")));
+
+  const copyConfig = document.getElementById("copyConfig");
+  copyConfig.addEventListener("click", async () =>
+    flash(copyConfig, await copy(document.getElementById("configCode").textContent)));
+
+  document.querySelectorAll(".snip-copy").forEach((btn) => {
+    btn.addEventListener("click", async () => flash(btn, await copy(btn.dataset.copy)));
   });
 
-  /* --- chrome ------------------------------------------------------------- */
+  /* ── chrome ────────────────────────────────────────────────────────── */
 
   const topbar = document.querySelector(".topbar");
-  const onScroll = () => topbar.classList.toggle("stuck", window.scrollY > 8);
+  const onScroll = () => {
+    topbar.classList.toggle("stuck", window.scrollY > 8);
+    onProgress();
+  };
   window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onProgress, { passive: true });
   onScroll();
 
   if (!reduced && "IntersectionObserver" in window) {
@@ -580,9 +841,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }),
       { rootMargin: "0px 0px -12% 0px" },
     );
-    document.querySelectorAll(".band > *, .diff, .card").forEach((n, i) => {
+    document.querySelectorAll(".band > *, .diff, .card, .ledger-col").forEach((n, i) => {
       n.classList.add("reveal");
-      n.style.transitionDelay = `${Math.min(i * 28, 180)}ms`;
+      n.style.transitionDelay = `${Math.min(i * 26, 160)}ms`;
       io.observe(n);
     });
   }

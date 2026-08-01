@@ -1,11 +1,14 @@
 <p align="center">
-  <img src="site/assets/banner.png" alt="cockpit · claude — your session, from the flight deck" width="100%">
+  <img src="site/assets/banner.png" alt="cockpit · claude: your session, from the flight deck" width="100%">
 </p>
 
 <p align="center">
   <a href="https://cockpit.js.org">cockpit.js.org</a> ·
   <a href="docs/CONFIG.md">Config</a> ·
   <a href="docs/FAQ.md">FAQ</a> ·
+  <a href="docs/ROADMAP.md">Roadmap</a> ·
+  <a href="CONTRIBUTING.md">Contributing</a> ·
+  <a href="https://github.com/noluyorAbi/cockpit-claude/discussions">Discussions</a> ·
   <a href="https://www.npmjs.com/package/cockpit-claude">npm</a>
 </p>
 
@@ -96,6 +99,48 @@ Every one of them has an off switch. See [docs/CONFIG.md](docs/CONFIG.md).
 - **It does not jitter.** Live numbers sit in fixed-width fields, so `$9.99` rolling to
   `$10.00` does not shove the rest of the line sideways.
 
+## What it costs you
+
+The honest half, so you can decide before installing rather than after.
+
+- **Four lines is real estate.** On a 24-row terminal that is roughly a sixth of it,
+  gone before you type anything. Turning off `ledger`, `todos` and `pool` collapses it
+  to two.
+- **Four `git` subprocesses per render.** On a huge repo or a network filesystem this
+  is the slowest thing it does. `"segments": { "git": false }` is the fix.
+- **The 16.5% auto-compact buffer is a constant, not a reading.** If Claude Code
+  retunes auto-compact, the context bar is wrong until you retune the config.
+- **The projection is naive.** Straight linear extrapolation. Bursty work makes it
+  swing, and it only ever answers "if you keep going exactly like this".
+- **The pool is a floor, not a total.** It counts sessions running cockpit. A window
+  with a different statusline is invisible to it.
+- **Config is global.** One file for every repo, and no way to reorder segments.
+- **It cannot act.** It says `↓ease`. It will never change your effort level for you.
+
+[docs/ROADMAP.md](docs/ROADMAP.md) tracks which of these are worth fixing and which are
+deliberate.
+
+## Contributing
+
+MIT, developed in the open, and small enough to read in one sitting. The whole
+statusline is one dependency-free file; adding a segment is a function and a config
+key. The one hard rule is that `render()` must never throw, because a throw blanks the
+user's statusline on every render rather than printing an error.
+
+Start with [CONTRIBUTING.md](CONTRIBUTING.md), or with anything in
+[the roadmap](docs/ROADMAP.md) that is unclaimed. Open-ended ideas and arguments about
+the defaults belong in
+[Discussions](https://github.com/noluyorAbi/cockpit-claude/discussions), which is also
+what the comment thread on the website reads from.
+
+## Showcase
+
+Built something on top of this? A fork, an extra segment, a terminal theme, a port, a
+tool that reads the same numbers: open a
+[showcase issue](https://github.com/noluyorAbi/cockpit-claude/issues/new?template=showcase.yml)
+and it goes on [cockpit.js.org](https://cockpit.js.org/#community). You do not need to
+have contributed here first.
+
 ## The repo ledger segment
 
 `repo Σ$1,284 · time 96h · 37×` reads `<repo>/.claude/costs.csv`, a per-repo CSV with a
@@ -111,7 +156,13 @@ npm test                   # render fixtures, assert the panel survives bad inpu
 ```
 
 The site in `site/` is static: plain HTML, one stylesheet, one script, no build step.
+Its hero panel is a simulation running the same `projectLimit` maths as the real
+statusline, so if you change that function, change the ported copy in `site/main.js`
+too.
 
 ## License
 
 MIT
+
+Made by [Alperen Adatepe](https://adatepe.dev), a full-stack engineer in Munich.
+More at [adatepe.dev](https://adatepe.dev).

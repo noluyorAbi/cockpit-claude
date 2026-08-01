@@ -1,0 +1,12 @@
+{
+  "name": "cockpit · claude",
+  "short_name": "cockpit",
+  "description": "A four-line statusline for Claude Code: usable context, burn rate, rate-limit pace projection, and every session sharing your limit.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#0c0b09",
+  "theme_color": "#0c0b09",
+  "icons": [
+    { "src": "assets/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}

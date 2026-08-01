@@ -3,49 +3,189 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>cockpit · claude / a four-line instrument panel for Claude Code</title>
-<meta name="description" content="A four-line statusline for Claude Code. Usable context, spend rate, rate-limit pace projection, and every session sharing your limit. Zero dependencies.">
-<meta name="color-scheme" content="light dark">
 
+<title>cockpit · claude / a four-line statusline for Claude Code</title>
+<meta name="description" content="An open-source four-line statusline for Claude Code. Shows usable context after auto-compact, session burn rate, rate-limit pace projection with a cap ETA, and every session sharing your limit. Zero dependencies, no network, MIT.">
+<link rel="canonical" href="https://cockpit.js.org/">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#eceadf" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0c0b09" media="(prefers-color-scheme: dark)">
+<meta name="author" content="Alperen Adatepe">
+<meta name="keywords" content="claude code statusline, claude code status line, context window monitor, rate limit tracker, token usage, terminal statusline, node cli, open source">
+
+<meta property="og:site_name" content="cockpit · claude">
 <meta property="og:title" content="cockpit · claude">
-<meta property="og:description" content="Your session, from the flight deck. Four lines: context, spend, limit pace, and the sessions you forgot were running.">
+<meta property="og:description" content="Your session, from the flight deck. Four lines: usable context, spend rate, rate-limit pace, and the sessions you forgot were running.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://cockpit.js.org">
+<meta property="og:url" content="https://cockpit.js.org/">
 <meta property="og:image" content="https://cockpit.js.org/assets/banner.png">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="The cockpit statusline showing a context bar, session cost, and a 5-hour rate limit projecting past its cap.">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="cockpit · claude">
+<meta name="twitter:description" content="A four-line statusline for Claude Code. Usable context, burn rate, rate-limit pace projection, cross-session pool.">
+<meta name="twitter:image" content="https://cockpit.js.org/assets/banner.png">
 
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="me" href="https://adatepe.dev">
+<link rel="author" href="https://adatepe.dev">
+<link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://cockpit.js.org/#software",
+      "name": "cockpit-claude",
+      "alternateName": "cockpit · claude",
+      "applicationCategory": "DeveloperApplication",
+      "applicationSubCategory": "Command Line Tool",
+      "operatingSystem": "macOS, Linux, Windows",
+      "description": "A four-line statusline for Claude Code showing usable context after auto-compact, session spend and burn rate, rate-limit pace projection with a cap ETA, and the number of concurrent sessions sharing the account limit.",
+      "url": "https://cockpit.js.org/",
+      "downloadUrl": "https://www.npmjs.com/package/cockpit-claude",
+      "installUrl": "https://www.npmjs.com/package/cockpit-claude",
+      "softwareVersion": "1.0.0",
+      "license": "https://opensource.org/licenses/MIT",
+      "isAccessibleForFree": true,
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "softwareRequirements": "Node.js 18 or newer",
+      "author": { "@id": "https://adatepe.dev/#person" },
+      "maintainer": { "@id": "https://adatepe.dev/#person" },
+      "featureList": [
+        "Usable context bar that accounts for the auto-compact buffer",
+        "Session spend and hourly burn rate",
+        "5-hour and 7-day rate limit bars with linear pace projection",
+        "Cap ETA when the projected pace exceeds the window",
+        "Cross-session pool count and combined burn rate",
+        "Per-repository lifetime cost ledger",
+        "Zero dependencies and no network access"
+      ]
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "@id": "https://cockpit.js.org/#source",
+      "name": "cockpit-claude",
+      "codeRepository": "https://github.com/noluyorAbi/cockpit-claude",
+      "programmingLanguage": "JavaScript",
+      "runtimePlatform": "Node.js",
+      "license": "https://opensource.org/licenses/MIT",
+      "author": { "@id": "https://adatepe.dev/#person" }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://adatepe.dev/#person",
+      "name": "Alperen Adatepe",
+      "url": "https://adatepe.dev",
+      "jobTitle": "Full-Stack Developer and Software Engineer",
+      "sameAs": [
+        "https://github.com/noluyorAbi",
+        "https://in.adatepe.dev",
+        "https://orcid.org/0009-0005-0924-0347"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://cockpit.js.org/#website",
+      "url": "https://cockpit.js.org/",
+      "name": "cockpit · claude",
+      "inLanguage": "en",
+      "publisher": { "@id": "https://adatepe.dev/#person" },
+      "about": { "@id": "https://cockpit.js.org/#software" }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://cockpit.js.org/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why does the cockpit context bar read higher than Claude Code's own number?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "They measure different things. Claude Code reports raw remaining context. Auto-compact fires while a buffer is still on the clock, so raw remaining overstates real headroom. cockpit subtracts that buffer, which means its 100% is the moment compaction fires rather than the moment the window is literally full. Set context.autoCompactBuffer to 0 to see the raw number."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What does the cap ETA mean?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Your current pace, extended linearly to the end of the 5-hour window, lands past 100 percent. The cap ETA is the estimated time until you hit the limit. It replaces the projection figure whenever that projection would exceed 100 percent."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does cockpit send any data over the network?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. It has zero dependencies and makes no network calls. Rate limits arrive inside the JSON payload Claude Code already pipes to the statusline command. It reads only local files: todo files, an optional per-repository cost CSV, and the pool heartbeat files it writes itself."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What exactly does the pool number count?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sessions that are running cockpit and have written a heartbeat in the last 90 seconds. A Claude Code window using a different statusline is invisible to it, so the number is a floor rather than a guaranteed total."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is cockpit-claude open source?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. It is MIT licensed, developed in the open at github.com/noluyorAbi/cockpit-claude, and accepts contributions. New segments, terminal themes and forks are welcome, and there is a showcase for projects built on top of it."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
 </head>
 <body>
 
 <a class="skip" href="#main">Skip to content</a>
+<div class="progress" id="progress" aria-hidden="true"></div>
 
 <header class="topbar">
   <a class="brand" href="#top">
-    <button class="beacon" id="beacon" type="button" aria-label="Trigger a burn-rate spike in the demo panel" title="go on, press it"></button>
+    <button class="beacon" id="beacon" type="button" aria-label="Spike the burn rate in the demo panel" title="go on, press it"></button>
     <span class="brand-name">COCKPIT</span>
     <span class="brand-sep">·</span>
     <span class="brand-sub">CLAUDE</span>
   </a>
   <nav class="nav" aria-label="Primary">
     <a href="#signals">Signals</a>
-    <a href="#difference">Why four lines</a>
-    <a href="#internals">Under the hood</a>
-    <a href="#config">Config</a>
-    <a class="ext" href="https://github.com/noluyorAbi/cockpit-claude">GitHub<span aria-hidden="true">↗</span></a>
+    <a href="#tradeoffs">Trade-offs</a>
+    <a href="#community">Community</a>
+    <a href="#faq">FAQ</a>
+    <button class="theme" id="theme" type="button" aria-label="Switch colour theme" title="Theme (t)">
+      <span class="theme-icon" id="themeIcon" aria-hidden="true">◐</span>
+      <span class="theme-name" id="themeName">SYSTEM</span>
+    </button>
+    <a class="ext ghost" href="https://github.com/noluyorAbi/cockpit-claude">GitHub<span aria-hidden="true">↗</span></a>
   </nav>
 </header>
 
 <main id="main">
 <div class="sheet" id="top">
 
-  <!-- ── hero ───────────────────────────────────────────────────────── -->
+  <!-- ══ hero ═══════════════════════════════════════════════════════════ -->
   <section class="hero">
-    <p class="eyebrow"><span class="dot" aria-hidden="true"></span> CLAUDE CODE <span class="sep">·</span> STATUSLINE</p>
+    <p class="eyebrow">
+      <span class="dot" aria-hidden="true"></span> CLAUDE CODE <span class="sep">·</span> STATUSLINE
+      <a class="oss-chip" href="#community">OPEN SOURCE</a>
+    </p>
     <h1>Your session,<br>from the flight deck.</h1>
     <p class="lede">
       Four lines under your prompt. How much context you can <em>actually</em> still use,
@@ -53,18 +193,26 @@
       before it resets, and how many other sessions are quietly eating the same limit.
     </p>
 
-    <!-- the live panel -->
     <div class="panel-wrap">
-      <div class="panel-chrome" aria-hidden="true">
-        <span class="tl-dot"></span><span class="tl-dot"></span><span class="tl-dot"></span>
+      <div class="panel-chrome">
+        <span class="tl-dot" aria-hidden="true"></span><span class="tl-dot" aria-hidden="true"></span><span class="tl-dot" aria-hidden="true"></span>
         <span class="tl-title">claude · cockpit</span>
         <span class="live-tag" id="liveTag">LIVE</span>
       </div>
-      <div class="panel" id="panel" role="img" aria-label="A live simulation of the cockpit statusline: model, context bar, token counts, session cost, repo lifetime cost, five-hour and seven-day rate limit bars, and the count of concurrent sessions."></div>
+      <div class="panel" id="panel" role="img" aria-label="A live simulation of the cockpit statusline: model and effort badge, usable context bar, token counts, session cost and burn rate, repository lifetime cost, five-hour and seven-day rate limit bars with pace projection, and the count of concurrent sessions."></div>
+      <div class="transport">
+        <button class="tp-btn" id="playBtn" type="button" aria-label="Pause the simulation">
+          <span id="playIcon" aria-hidden="true">❚❚</span>
+        </button>
+        <label class="tp-scrub">
+          <span class="visually-hidden">Scrub through the simulated session</span>
+          <input type="range" id="scrub" min="0" max="1000" value="0" step="1">
+        </label>
+        <span class="tp-clock mono" id="clock">00:00 / 05:00</span>
+      </div>
     </div>
     <p class="narration" id="narration" aria-live="polite">Session warming up.</p>
 
-    <!-- install -->
     <div class="install">
       <button class="cmd" id="copyBtn" type="button" title="Copy to clipboard">
         <span class="prompt" aria-hidden="true">$</span>
@@ -72,13 +220,21 @@
         <span class="copy-label" id="copyLabel">COPY</span>
       </button>
       <p class="fineprint">
-        Node 18+. macOS, Linux, Windows. Backs up <code>settings.json</code> before it touches it.
-        <br><span class="dim">Not ready to commit? <code>npx cockpit-claude --dry-run</code> shows every change and writes nothing.</span>
+        Backs up <code>settings.json</code> before it touches it.
+        <span class="dim">Not ready? <code>--dry-run</code> shows every change and writes nothing.</span>
       </p>
     </div>
+
+    <ul class="specs" aria-label="At a glance">
+      <li><span class="spec-v">0</span><span class="spec-k">dependencies</span></li>
+      <li><span class="spec-v">0</span><span class="spec-k">network calls</span></li>
+      <li><span class="spec-v">14</span><span class="spec-k">signals</span></li>
+      <li><span class="spec-v">MIT</span><span class="spec-k">licensed</span></li>
+      <li><span class="spec-v">18+</span><span class="spec-k">node</span></li>
+    </ul>
   </section>
 
-  <!-- ── the difference ─────────────────────────────────────────────── -->
+  <!-- ══ why four lines ═════════════════════════════════════════════════ -->
   <section id="difference" class="band">
     <p class="kicker">WHY FOUR LINES</p>
     <h2>Three things one line can't tell you.</h2>
@@ -140,7 +296,7 @@
     </ol>
   </section>
 
-  <!-- ── signal inspector ───────────────────────────────────────────── -->
+  <!-- ══ signal inspector ═══════════════════════════════════════════════ -->
   <section id="signals" class="band">
     <p class="kicker">WHAT IT SHOWS</p>
     <h2>Fourteen signals, four lines.</h2>
@@ -158,7 +314,70 @@
     </div>
   </section>
 
-  <!-- ── internals ──────────────────────────────────────────────────── -->
+  <!-- ══ trade-offs ═════════════════════════════════════════════════════ -->
+  <section id="tradeoffs" class="band">
+    <p class="kicker">THE HONEST LEDGER</p>
+    <h2>What it does. What it costs you.</h2>
+    <p class="section-lede">
+      Every statusline is a trade: screen space and a subprocess or two, in exchange for
+      not having to guess. Here is both sides, so you can decide before you install
+      rather than after.
+    </p>
+
+    <div class="ledger">
+      <div class="ledger-col pro">
+        <h3 class="ledger-head"><span class="ledger-sign" aria-hidden="true">+</span> What it does</h3>
+        <ul class="ledger-list">
+          <li><b>Reports usable context.</b> The auto-compact buffer is subtracted, so 100% is compaction, not a full window.</li>
+          <li><b>Projects, not just reports.</b> Rate limits get a pace figure and a cap ETA, the only genuinely actionable form of that number.</li>
+          <li><b>Sees the whole fleet.</b> The pool count is information no single window can derive on its own.</li>
+          <li><b>Remembers the repo.</b> Lifetime spend, active time and session count, read from the repo's own ledger.</li>
+          <li><b>Costs nothing at runtime.</b> Zero dependencies, zero network calls, zero telemetry.</li>
+          <li><b>Fails quietly.</b> Every reader is wrapped; a broken segment drops out instead of blanking the line with a stack trace.</li>
+          <li><b>Holds its columns.</b> Live numbers sit in fixed-width fields, so growing values never shove the line sideways.</li>
+          <li><b>Turns off.</b> Every one of the fourteen segments has a switch.</li>
+        </ul>
+      </div>
+
+      <div class="ledger-col con">
+        <h3 class="ledger-head"><span class="ledger-sign" aria-hidden="true">−</span> What it costs</h3>
+        <ul class="ledger-list">
+          <li><b>Four lines is real estate.</b> On a 24-row terminal that is a sixth of it, gone before you type anything.</li>
+          <li><b>Four <span class="mono">git</span> subprocesses per render.</b> On a huge repo or a network filesystem this is the slowest thing it does. <span class="mono">segments.git: false</span> is the fix.</li>
+          <li><b>The 16.5% buffer is a constant, not a reading.</b> If Claude Code retunes auto-compact, the bar is wrong until you retune the config.</li>
+          <li><b>The projection is naive.</b> Straight linear extrapolation. Bursty work makes it swing, and it only ever answers "if you keep going exactly like this".</li>
+          <li><b>The pool is a floor, not a total.</b> It counts sessions running cockpit. A window with a different statusline is invisible to it.</li>
+          <li><b>The ledger needs a file nobody writes for you.</b> No <span class="mono">.claude/costs.csv</span>, no <span class="mono">Σ$</span> segment.</li>
+          <li><b>Config is global.</b> One file for every repo; no per-project overrides, and no way to reorder segments.</li>
+          <li><b>It cannot act.</b> It says <span class="mono c-red">↓ease</span>. It will never change your effort level for you.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- the real-estate cost, drawn -->
+    <figure class="estate">
+      <div class="estate-term" id="estateTerm" aria-hidden="true"></div>
+      <figcaption>
+        Four of twenty-four rows. <span class="dim">The honest way to read the trade: turn off
+        <span class="mono">ledger</span>, <span class="mono">todos</span> and <span class="mono">pool</span>
+        and it collapses to two.</span>
+      </figcaption>
+    </figure>
+
+    <div class="roadmap">
+      <h3 class="roadmap-head">What it could do</h3>
+      <p class="roadmap-lede">
+        Known gaps, in rough order of how much they would help. None of them are claimed.
+        Every one is a reasonable first contribution.
+      </p>
+      <ul class="road-list" id="roadList"></ul>
+      <a class="cta" href="https://github.com/noluyorAbi/cockpit-claude/issues/new/choose">
+        Propose one of your own <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ══ internals ══════════════════════════════════════════════════════ -->
   <section id="internals" class="band">
     <p class="kicker">UNDER THE HOOD</p>
     <h2>Boring where it counts.</h2>
@@ -167,7 +386,7 @@
       <article class="card">
         <span class="card-n">01</span>
         <h3>One payload in</h3>
-        <p>Claude Code pipes a JSON blob to the statusline command on every render. cockpit reads that, your repo's cost ledger, and git. Nothing else.</p>
+        <p>Claude Code pipes a JSON blob to the statusline command on every render. cockpit reads that, the repo's cost ledger, and git. Nothing else.</p>
       </article>
       <article class="card">
         <span class="card-n">02</span>
@@ -176,18 +395,18 @@
       </article>
       <article class="card">
         <span class="card-n">03</span>
-        <h3>Fails to blank, not to a stack trace</h3>
+        <h3>Fails to blank</h3>
         <p>Every reader is wrapped. A missing ledger, a corrupt config, a repo with no upstream: the segment drops out and the rest of the panel renders.</p>
       </article>
       <article class="card">
         <span class="card-n">04</span>
         <h3>It doesn't jitter</h3>
-        <p>Live numbers sit in fixed-width fields. Your spend rolling from <span class="mono">$9.99</span> to <span class="mono">$10.00</span> won't shove the whole line sideways mid-thought.</p>
+        <p>Live numbers sit in fixed-width fields. Your spend rolling from <span class="mono">$9.99</span> to <span class="mono">$10.00</span> won't shove the line sideways mid-thought.</p>
       </article>
     </div>
   </section>
 
-  <!-- ── config ─────────────────────────────────────────────────────── -->
+  <!-- ══ config ═════════════════════════════════════════════════════════ -->
   <section id="config" class="band">
     <p class="kicker">CONFIG</p>
     <h2>Every segment has an off switch.</h2>
@@ -197,8 +416,11 @@
     </p>
 
     <div class="code-block">
-      <div class="code-head mono"><span>~/.claude/cockpit.config.json</span></div>
-<pre class="mono"><code><span class="t-p">{</span>
+      <div class="code-head mono">
+        <span>~/.claude/cockpit.config.json</span>
+        <button class="code-copy" id="copyConfig" type="button">COPY</button>
+      </div>
+<pre class="mono"><code id="configCode"><span class="t-p">{</span>
   <span class="t-k">"segments"</span><span class="t-p">:</span> <span class="t-p">{</span> <span class="t-k">"ledger"</span><span class="t-p">:</span> <span class="t-b">false</span><span class="t-p">,</span> <span class="t-k">"todos"</span><span class="t-p">:</span> <span class="t-b">false</span> <span class="t-p">},</span>
   <span class="t-k">"context"</span><span class="t-p">:</span>  <span class="t-p">{</span> <span class="t-k">"autoCompactBuffer"</span><span class="t-p">:</span> <span class="t-n">16.5</span><span class="t-p">,</span> <span class="t-k">"width"</span><span class="t-p">:</span> <span class="t-n">10</span> <span class="t-p">},</span>
   <span class="t-k">"limits"</span><span class="t-p">:</span>   <span class="t-p">{</span> <span class="t-k">"width"</span><span class="t-p">:</span> <span class="t-n">8</span><span class="t-p">,</span> <span class="t-k">"projection"</span><span class="t-p">:</span> <span class="t-b">true</span> <span class="t-p">},</span>
@@ -208,24 +430,162 @@
 
     <div class="cta-stack">
       <a class="cta" href="https://github.com/noluyorAbi/cockpit-claude/blob/main/docs/CONFIG.md">Every option, documented <span aria-hidden="true">↗</span></a>
-      <a class="cta" href="https://github.com/noluyorAbi/cockpit-claude/blob/main/docs/FAQ.md">Got a question? Read the FAQ <span aria-hidden="true">↗</span></a>
+    </div>
+  </section>
+
+  <!-- ══ community ══════════════════════════════════════════════════════ -->
+  <section id="community" class="band">
+    <p class="kicker">OPEN SOURCE</p>
+    <h2>It's yours too.</h2>
+    <p class="section-lede">
+      MIT, developed in the open, and small enough to read in one sitting.
+      Come argue about the defaults, ship a segment, or show what you built on top of it.
+    </p>
+
+    <div class="tabs" role="tablist" aria-label="Community">
+      <div class="tabs-rail">
+        <button class="tab" role="tab" id="tab-discussion" aria-controls="pane-discussion" aria-selected="true">Discussion</button>
+        <button class="tab" role="tab" id="tab-showcase" aria-controls="pane-showcase" aria-selected="false">Showcase</button>
+        <button class="tab" role="tab" id="tab-contribute" aria-controls="pane-contribute" aria-selected="false">Contribute</button>
+        <span class="tabs-pill" id="tabsPill" aria-hidden="true"></span>
+      </div>
+    </div>
+
+    <div class="panes" id="panes">
+      <!-- discussion -->
+      <div class="pane" id="pane-discussion" role="tabpanel" aria-labelledby="tab-discussion" tabindex="0">
+        <p class="pane-lede">
+          Comments here are <b>GitHub Discussions</b>, rendered in place. Post with your GitHub
+          account and the thread lives in the repo, not in a database only I can read.
+        </p>
+        <div id="giscus"></div>
+      </div>
+
+      <!-- showcase -->
+      <div class="pane" id="pane-showcase" role="tabpanel" aria-labelledby="tab-showcase" tabindex="0" hidden>
+        <p class="pane-lede">
+          Forks, themes, ports, and tools that read the same numbers. If you built something on
+          top of cockpit, it belongs here.
+        </p>
+        <div id="showcase" class="showcase"></div>
+      </div>
+
+      <!-- contribute -->
+      <div class="pane" id="pane-contribute" role="tabpanel" aria-labelledby="tab-contribute" tabindex="0" hidden>
+        <p class="pane-lede">
+          The whole statusline is one file with no dependencies. Adding a segment is a function
+          and a config key, and the tests run with <span class="mono">node scripts/test.js</span>.
+        </p>
+
+        <ol class="steps">
+          <li>
+            <span class="step-n">01</span>
+            <div>
+              <h4>Run it against a payload</h4>
+              <p>No Claude Code session needed. Pipe JSON straight in and see what renders.</p>
+              <div class="snippet mono">
+                <code>echo '{"model":{"display_name":"Test"}}' | node src/statusline.js</code>
+                <button class="snip-copy" type="button" data-copy="echo '{&quot;model&quot;:{&quot;display_name&quot;:&quot;Test&quot;}}' | node src/statusline.js">COPY</button>
+              </div>
+            </div>
+          </li>
+          <li>
+            <span class="step-n">02</span>
+            <div>
+              <h4>Add your segment</h4>
+              <p>Write a reader that returns <span class="mono">null</span> when it has nothing to say, wrap it in <span class="mono">safe()</span>, push it onto the right line, and add a key to <span class="mono">DEFAULTS.segments</span>.</p>
+            </div>
+          </li>
+          <li>
+            <span class="step-n">03</span>
+            <div>
+              <h4>Prove it cannot break the line</h4>
+              <p>The one hard rule: <span class="mono">render()</span> must never throw. A throw blanks the statusline on every single render. Add a case to the test file with the worst payload you can imagine.</p>
+              <div class="snippet mono">
+                <code>node scripts/test.js</code>
+                <button class="snip-copy" type="button" data-copy="node scripts/test.js">COPY</button>
+              </div>
+            </div>
+          </li>
+        </ol>
+
+        <div class="cta-stack">
+          <a class="cta" href="https://github.com/noluyorAbi/cockpit-claude/blob/main/CONTRIBUTING.md">Contributing guide <span aria-hidden="true">↗</span></a>
+          <a class="cta" href="https://github.com/noluyorAbi/cockpit-claude/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22">Good first issues <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ faq ════════════════════════════════════════════════════════════ -->
+  <section id="faq" class="band">
+    <p class="kicker">FAQ</p>
+    <h2>The questions that actually get asked.</h2>
+
+    <div class="faq" id="faqList">
+      <details class="qa">
+        <summary><span>Why does my context bar read higher than Claude Code's own number?</span><span class="chev" aria-hidden="true">+</span></summary>
+        <div class="qa-body"><p>Because it measures something different. Claude Code reports raw remaining context. Auto-compact fires while a buffer is still on the clock, so raw remaining overstates your actual headroom. cockpit subtracts that buffer, which means its 100% is the moment compaction fires, not the moment the window is literally full. Set <span class="mono">context.autoCompactBuffer</span> to <span class="mono">0</span> if you want the raw number back.</p></div>
+      </details>
+      <details class="qa">
+        <summary><span>What is <span class="mono">⚡cap~1h41m</span>?</span><span class="chev" aria-hidden="true">+</span></summary>
+        <div class="qa-body"><p>Your current pace, extended to the end of the 5-hour window, lands past 100%. That is the estimated time until you hit the cap. It replaces the <span class="mono">→N%</span> projection whenever the projection would exceed 100. Stop working and it stops being true, which is rather the point of showing it.</p></div>
+      </details>
+      <details class="qa">
+        <summary><span>Does it phone home?</span><span class="chev" aria-hidden="true">+</span></summary>
+        <div class="qa-body"><p>No. Zero dependencies, no network calls of any kind. Rate limits arrive inside the JSON payload Claude Code already pipes to the statusline command. The only things it reads from disk are your todo files, an optional per-repo cost CSV, and the pool heartbeats it writes itself.</p></div>
+      </details>
+      <details class="qa">
+        <summary><span>Four lines is a lot of terminal.</span><span class="chev" aria-hidden="true">+</span></summary>
+        <div class="qa-body"><p>It is, and that is the honest cost. Turn segments off until it is the size you want; with <span class="mono">ledger</span>, <span class="mono">todos</span> and <span class="mono">pool</span> off it collapses to two. The default is deliberately maximal because a segment you never configured is a segment you never had to think about.</p></div>
+      </details>
+      <details class="qa">
+        <summary><span>How is this different from redacted?</span><span class="chev" aria-hidden="true">+</span></summary>
+        <div class="qa-body"><p><a href="https://example.invalid/">redacted</a> is a well-made single-line statusline, and if one line is what you want you should use it. cockpit is the maximal end of the same idea: it spends four lines to add the pace projection, the repo lifetime ledger, and the cross-session pool, none of which fit on one line.</p></div>
+      </details>
+      <details class="qa">
+        <summary><span>Can I fork it, rename it, ship my own?</span><span class="chev" aria-hidden="true">+</span></summary>
+        <div class="qa-body"><p>Yes. MIT. Do what you like, no attribution dance required. If you build something on top of it, open a showcase issue and it goes on this page.</p></div>
+      </details>
+    </div>
+
+    <div class="cta-stack">
+      <a class="cta" href="https://github.com/noluyorAbi/cockpit-claude/blob/main/docs/FAQ.md">The rest of the FAQ <span aria-hidden="true">↗</span></a>
     </div>
   </section>
 
   <footer class="footer">
-    <p class="mono">Built for <strong>Claude Code</strong> <span class="dim">·</span> MIT</p>
+    <div class="foot-made">
+      <p class="mono">
+        Built for <strong>Claude Code</strong> <span class="dim">·</span> MIT <span class="dim">·</span>
+        <a href="https://github.com/noluyorAbi/cockpit-claude">source</a>
+      </p>
+      <p class="byline">
+        Made by <a href="https://adatepe.dev" rel="me author">Alperen Adatepe</a>,
+        <span class="dim">full-stack engineer in Munich. More at <a href="https://adatepe.dev">adatepe.dev</a>.</span>
+      </p>
+    </div>
     <nav class="mono foot-nav" aria-label="Footer">
       <a href="https://github.com/noluyorAbi/cockpit-claude/blob/main/docs/CONFIG.md">Config<span aria-hidden="true">↗</span></a>
       <a href="https://github.com/noluyorAbi/cockpit-claude/blob/main/docs/FAQ.md">FAQ<span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/noluyorAbi/cockpit-claude/blob/main/CONTRIBUTING.md">Contributing<span aria-hidden="true">↗</span></a>
       <a href="https://www.npmjs.com/package/cockpit-claude">npm<span aria-hidden="true">↗</span></a>
-      <a href="https://github.com/noluyorAbi/cockpit-claude">GitHub<span aria-hidden="true">↗</span></a>
-      <a href="https://github.com/noluyorAbi/cockpit-claude/issues">Issues<span aria-hidden="true">↗</span></a>
+      <a href="https://github.com/noluyorAbi/cockpit-claude/discussions">Discussions<span aria-hidden="true">↗</span></a>
+      <a href="llms.txt">llms.txt</a>
     </nav>
   </footer>
 
 </div>
 </main>
 
+<script id="giscus-config" type="application/json">
+{
+  "repo": "noluyorAbi/cockpit-claude",
+  "repoId": "REPLACE_WITH_REPO_ID",
+  "category": "Ideas",
+  "categoryId": "REPLACE_WITH_CATEGORY_ID"
+}
+</script>
 <script src="main.js"></script>
 </body>
 </html>

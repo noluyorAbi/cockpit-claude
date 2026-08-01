@@ -1,0 +1,54 @@
+name: Showcase
+description: Something you built on top of cockpit
+title: "[showcase] "
+labels: ["showcase"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Forks, extra segments, terminal themes, ports to other tools, anything
+        that reads the same numbers. Accepted entries go on cockpit.js.org.
+
+        You do not need to have contributed to this repo first.
+  - type: input
+    id: name
+    attributes:
+      label: Name
+      placeholder: cockpit-nord
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Link
+      description: Repository, release, gist, or blog post.
+      placeholder: https://github.com/you/cockpit-nord
+    validations:
+      required: true
+  - type: input
+    id: author
+    attributes:
+      label: Who to credit
+      placeholder: "@yourhandle"
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What is it
+      options:
+        - fork
+        - segment
+        - theme
+        - port
+        - tool
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: One or two sentences
+      description: What it does and why you built it. This is the card text on the site.
+    validations:
+      required: true

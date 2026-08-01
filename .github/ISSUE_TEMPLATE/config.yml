@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Idea or question
+    url: https://github.com/noluyorAbi/cockpit-claude/discussions
+    about: Defaults you disagree with, segments you wish existed, anything open-ended. Discussions are also what the comment thread on cockpit.js.org is reading.
+  - name: Roadmap
+    url: https://github.com/noluyorAbi/cockpit-claude/blob/main/docs/ROADMAP.md
+    about: The known gaps, none of them claimed. Say so before you start one.

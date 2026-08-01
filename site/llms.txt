@@ -1,0 +1,36 @@
+# cockpit-claude
+
+> An open-source, zero-dependency statusline for Claude Code. It renders four lines under the prompt: session identity and git state; usable context, tokens, spend and burn rate; 5-hour and 7-day rate-limit windows with a linear pace projection and a cap ETA; and the active todo. MIT licensed, no network access, no telemetry.
+
+cockpit is the maximal end of the statusline idea. It exists because three numbers cannot be derived from a single line of output:
+
+1. **Usable context.** Claude Code reports raw remaining context, but auto-compact fires while a buffer (default 16.5%) is still on the clock. cockpit subtracts that buffer, so its 100% means "compaction fires now", not "the window is literally full".
+2. **Pace, not position.** A rate-limit percentage is not actionable without knowing how fast you reached it. cockpit divides usage by the fraction of the window elapsed to project an end-of-window figure (`→84%`). When that projection exceeds 100%, it prints the estimated time until the cap instead (`⚡cap~1h41m`) and the reasoning-effort badge escalates to `↓ease`.
+3. **Concurrent sessions.** Rate limits are billed to the account, not the terminal window. Every running cockpit writes a heartbeat file to a shared temp directory, so each panel can report how many sessions are burning the same limit and their combined hourly rate (`pool 5 live ⌁Σ$31/hr`).
+
+Install with `npx cockpit-claude`. The installer copies the statusline to `~/.claude/cockpit/statusline.js`, writes a default config, and points `statusLine.command` at it, backing up `settings.json` first. `--dry-run`, `--preview` and `--uninstall` are supported.
+
+Known limitations, stated plainly: four lines is roughly a sixth of a 24-row terminal; it runs four `git` subprocesses per render; the 16.5% auto-compact buffer is a calibrated constant rather than a reading and can drift if Claude Code retunes it; the projection is a naive linear extrapolation that swings under bursty work; the pool counts only sessions running cockpit, so it is a floor rather than a total; the repo lifetime ledger requires a `.claude/costs.csv` that cockpit reads but never writes; config is global with no per-project override and no way to reorder segments; and it never acts on your behalf, it only reports.
+
+Author: Alperen Adatepe (https://adatepe.dev), GitHub @noluyorAbi.
+
+## Docs
+
+- [Configuration reference](https://github.com/noluyorAbi/cockpit-claude/blob/main/docs/CONFIG.md): every segment toggle, the auto-compact buffer, limit widths, pool timings and colour overrides.
+- [FAQ](https://github.com/noluyorAbi/cockpit-claude/blob/main/docs/FAQ.md): why the context bar differs from Claude Code's number, what the cap ETA means, privacy, performance, Windows support, recovery from a blank statusline.
+- [Roadmap](https://github.com/noluyorAbi/cockpit-claude/blob/main/docs/ROADMAP.md): unclaimed gaps, including per-project config, a ledger writer, configurable segment order and a `--json` mode.
+- [Contributing](https://github.com/noluyorAbi/cockpit-claude/blob/main/CONTRIBUTING.md): how to add a segment, the one hard rule (`render()` must never throw), and how to run the tests.
+- [Deploying the site](https://github.com/noluyorAbi/cockpit-claude/blob/main/docs/DEPLOY.md): GitHub Pages workflow and the js.org domain ordering.
+
+## Source
+
+- [Repository](https://github.com/noluyorAbi/cockpit-claude): MIT, zero dependencies, Node 18+.
+- [Statusline implementation](https://github.com/noluyorAbi/cockpit-claude/blob/main/src/statusline.js): the whole renderer in one file.
+- [Installer](https://github.com/noluyorAbi/cockpit-claude/blob/main/bin/cockpit.js): the `npx cockpit-claude` entry point.
+- [npm package](https://www.npmjs.com/package/cockpit-claude)
+- [Discussions](https://github.com/noluyorAbi/cockpit-claude/discussions): ideas, questions, and the showcase of projects built on top of it.
+
+## Optional
+
+- [Website](https://cockpit.js.org/): includes a live simulation of the panel running the same projection maths.
+- [redacted](https://example.invalid/): a single-line statusline for Claude Code. Prefer it if one line is what you want; cockpit trades three extra lines for the projection, the ledger and the pool.
