@@ -12,20 +12,32 @@
 <meta name="theme-color" content="#0c0b09" media="(prefers-color-scheme: dark)">
 <meta name="author" content="Alperen Adatepe">
 <meta name="keywords" content="claude code statusline, claude code status line, context window monitor, rate limit tracker, token usage, terminal statusline, node cli, open source">
+<!-- Answer engines and image search both need explicit permission for a full
+     snippet and a large thumbnail; the default is a truncated preview. -->
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 
 <meta property="og:site_name" content="cockpit · claude">
 <meta property="og:title" content="cockpit · claude">
 <meta property="og:description" content="Your session, from the flight deck. Four lines: usable context, spend rate, rate-limit pace, and the sessions you forgot were running.">
 <meta property="og:type" content="website">
+<meta property="og:locale" content="en">
 <meta property="og:url" content="https://noluyorabi.github.io/cockpit-claude/">
-<meta property="og:image" content="https://noluyorabi.github.io/cockpit-claude/assets/banner.png">
+<meta property="og:image" content="https://noluyorabi.github.io/cockpit-claude/assets/og.png">
+<meta property="og:image:secure_url" content="https://noluyorabi.github.io/cockpit-claude/assets/og.png">
+<meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="640">
-<meta property="og:image:alt" content="The cockpit statusline showing a context bar, session cost, and a 5-hour rate limit projecting past its cap.">
+<meta property="og:image:alt" content="The cockpit statusline printing four lines of real terminal output: a context bar at 65 percent, a session cost of $4.82 at $6.90 per hour, and a 5-hour rate limit projecting past its cap in 1 hour 41 minutes.">
+<meta property="og:video" content="https://noluyorabi.github.io/cockpit-claude/assets/demo.mp4">
+<meta property="og:video:type" content="video/mp4">
+<meta property="og:video:width" content="1920">
+<meta property="og:video:height" content="1080">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="cockpit · claude">
 <meta name="twitter:description" content="A four-line statusline for Claude Code. Usable context, burn rate, rate-limit pace projection, cross-session pool.">
-<meta name="twitter:image" content="https://noluyorabi.github.io/cockpit-claude/assets/banner.png">
+<meta name="twitter:image" content="https://noluyorabi.github.io/cockpit-claude/assets/og.png">
+<meta name="twitter:image:alt" content="The cockpit statusline printing four lines of real terminal output, with a 5-hour rate limit projecting past its cap.">
 
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
 <link rel="manifest" href="manifest.webmanifest">
@@ -55,10 +67,17 @@
       "downloadUrl": "https://www.npmjs.com/package/cockpit-claude",
       "installUrl": "https://www.npmjs.com/package/cockpit-claude",
       "softwareVersion": "1.0.0",
+      "datePublished": "2026-08-01",
+      "dateModified": "2026-08-01",
+      "releaseNotes": "https://github.com/noluyorAbi/cockpit-claude/releases/tag/v1.0.0",
+      "softwareHelp": "https://github.com/noluyorAbi/cockpit-claude/blob/main/docs/CONFIG.md",
+      "discussionUrl": "https://github.com/noluyorAbi/cockpit-claude/discussions",
       "license": "https://opensource.org/licenses/MIT",
       "isAccessibleForFree": true,
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
       "softwareRequirements": "Node.js 18 or newer",
+      "screenshot": "https://noluyorabi.github.io/cockpit-claude/assets/og.png",
+      "video": { "@id": "https://noluyorabi.github.io/cockpit-claude/#demo" },
       "author": { "@id": "https://adatepe.dev/#person" },
       "maintainer": { "@id": "https://adatepe.dev/#person" },
       "featureList": [
@@ -69,6 +88,56 @@
         "Cross-session pool count and combined burn rate",
         "Per-repository lifetime cost ledger",
         "Zero dependencies and no network access"
+      ]
+    },
+    {
+      "@type": "VideoObject",
+      "@id": "https://noluyorabi.github.io/cockpit-claude/#demo",
+      "name": "cockpit-claude running in a terminal",
+      "description": "A sixteen second screen recording of npx cockpit-claude --preview. The output is captured from the tool itself rather than recreated, and shows the four-line panel with the usable context bar, the session spend and burn rate, and the 5-hour window projecting past its cap.",
+      "contentUrl": "https://noluyorabi.github.io/cockpit-claude/assets/demo.mp4",
+      "thumbnailUrl": "https://noluyorabi.github.io/cockpit-claude/assets/demo-poster.jpg",
+      "uploadDate": "2026-08-01",
+      "duration": "PT16S",
+      "isFamilyFriendly": true,
+      "license": "https://opensource.org/licenses/MIT",
+      "author": { "@id": "https://adatepe.dev/#person" }
+    },
+    {
+      "@type": "HowTo",
+      "@id": "https://noluyorabi.github.io/cockpit-claude/#install",
+      "name": "Install the cockpit statusline in Claude Code",
+      "description": "Install cockpit-claude and wire it into Claude Code's statusLine setting.",
+      "totalTime": "PT2M",
+      "tool": [
+        { "@type": "HowToTool", "name": "Node.js 18 or newer" },
+        { "@type": "HowToTool", "name": "Claude Code" }
+      ],
+      "step": [
+        {
+          "@type": "HowToStep",
+          "name": "Preview it without installing",
+          "text": "Run npx cockpit-claude --dry-run to print every change it would make, or npx cockpit-claude --preview to render a sample panel. Neither writes anything.",
+          "url": "https://noluyorabi.github.io/cockpit-claude/#top"
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Install",
+          "text": "Run npx cockpit-claude. It copies the statusline to ~/.claude/cockpit/statusline.js, writes a default config, backs up settings.json to a timestamped file, and points statusLine.command at the installed file.",
+          "url": "https://noluyorabi.github.io/cockpit-claude/#top"
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Restart Claude Code",
+          "text": "Start a new session. The four-line panel appears under the prompt.",
+          "url": "https://noluyorabi.github.io/cockpit-claude/#top"
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Turn off what you do not want",
+          "text": "Every one of the fourteen segments has a switch in ~/.claude/cockpit.config.json. A missing or malformed file falls back to the full panel rather than to a blank line.",
+          "url": "https://noluyorabi.github.io/cockpit-claude/#config"
+        }
       ]
     },
     {
@@ -312,6 +381,31 @@
         <p class="detail-idle">Hover a segment to read it.</p>
       </div>
     </div>
+  </section>
+
+  <!-- ══ recording ══════════════════════════════════════════════════════ -->
+  <section id="recording" class="band">
+    <p class="kicker">RECORDING</p>
+    <h2>The panel at the top is a simulation. This is not.</h2>
+    <p class="section-lede">
+      The hero runs invented session data through the real projection maths, because
+      a page cannot have a live Claude Code session. This is sixteen seconds of actual
+      <span class="mono">stdout</span>, captured from the tool and not recreated.
+      It shows three lines rather than four: the sample payload has no todo list and
+      the repo has no cost ledger, so the panel correctly hides both segments.
+    </p>
+    <video
+      class="recording"
+      controls
+      preload="none"
+      playsinline
+      width="1920" height="1080"
+      poster="assets/demo-poster.jpg"
+      aria-label="Screen recording of npx cockpit-claude --preview printing the statusline panel">
+      <source src="assets/demo.mp4" type="video/mp4">
+      Your browser cannot play this video.
+      <a href="assets/demo.mp4">Download the recording</a> instead.
+    </video>
   </section>
 
   <!-- ══ trade-offs ═════════════════════════════════════════════════════ -->

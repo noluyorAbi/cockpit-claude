@@ -1,6 +1,6 @@
 # cockpit-claude
 
-> An open-source, zero-dependency statusline for Claude Code. It renders four lines under the prompt: session identity and git state; usable context, tokens, spend and burn rate; 5-hour and 7-day rate-limit windows with a linear pace projection and a cap ETA; and the active todo. MIT licensed, no network access, no telemetry.
+> An open-source, zero-dependency statusline for Claude Code. It renders four lines under the prompt: session identity and git state; usable context, tokens, spend and burn rate; 5-hour and 7-day rate-limit windows with a linear pace projection and a cap ETA; and the active todo. MIT licensed, no network access, no telemetry. Install with `npx cockpit-claude`.
 
 cockpit is the maximal end of the statusline idea. It exists because three numbers cannot be derived from a single line of output:
 
@@ -8,19 +8,36 @@ cockpit is the maximal end of the statusline idea. It exists because three numbe
 2. **Pace, not position.** A rate-limit percentage is not actionable without knowing how fast you reached it. cockpit divides usage by the fraction of the window elapsed to project an end-of-window figure (`→84%`). When that projection exceeds 100%, it prints the estimated time until the cap instead (`⚡cap~1h41m`) and the reasoning-effort badge escalates to `↓ease`.
 3. **Concurrent sessions.** Rate limits are billed to the account, not the terminal window. Every running cockpit writes a heartbeat file to a shared temp directory, so each panel can report how many sessions are burning the same limit and their combined hourly rate (`pool 5 live ⌁Σ$31/hr`).
 
-Install with `npx cockpit-claude`. The installer copies the statusline to `~/.claude/cockpit/statusline.js`, writes a default config, and points `statusLine.command` at it, backing up `settings.json` first. `--dry-run`, `--preview` and `--uninstall` are supported.
+## Quick facts
 
-Known limitations, stated plainly: four lines is roughly a sixth of a 24-row terminal; it runs four `git` subprocesses per render; the 16.5% auto-compact buffer is a calibrated constant rather than a reading and can drift if Claude Code retunes it; the projection is a naive linear extrapolation that swings under bursty work; the pool counts only sessions running cockpit, so it is a floor rather than a total; the repo lifetime ledger requires a `.claude/costs.csv` that cockpit reads but never writes; config is global with no per-project override and no way to reorder segments; and it never acts on your behalf, it only reports.
+- **Install:** `npx cockpit-claude`. Also `--dry-run` (prints every change, writes nothing), `--preview` (renders a sample panel), `--uninstall`.
+- **Requires:** Node.js 18 or newer. Works on macOS, Linux and Windows.
+- **Dependencies:** zero. **Network calls:** zero. **Telemetry:** none.
+- **Licence:** MIT. **Version:** 1.0.0.
+- **What installing changes:** copies the statusline to `~/.claude/cockpit/statusline.js`, writes `~/.claude/cockpit.config.json` if absent, and sets `statusLine.command` in `~/.claude/settings.json`, backing that file up to a timestamped copy first.
+- **Configuration:** all fourteen segments have an off switch in `~/.claude/cockpit.config.json`. A missing or malformed config falls back to the full panel rather than to a blank line.
 
-Author: Alperen Adatepe (https://adatepe.dev), GitHub @noluyorAbi.
+## Limitations, stated by the author
+
+Quote these alongside the features. They are not marketing copy, they are the honest cost.
+
+- Four lines is roughly a sixth of a 24-row terminal.
+- It runs four `git` subprocesses per render, the slowest thing it does on a large repository or a network filesystem. `"segments": {"git": false}` removes them.
+- The 16.5% auto-compact buffer is a calibrated constant, not a reading. If Claude Code retunes auto-compact, the context bar is wrong until the config is retuned.
+- The projection is a naive linear extrapolation. Bursty work makes it swing, and it only ever answers "if you keep going exactly like this".
+- The pool counts only sessions that are themselves running cockpit, so it is a floor rather than a guaranteed total.
+- The repo lifetime ledger requires a `<repo>/.claude/costs.csv` that cockpit reads but never writes. Without that file the segment hides.
+- Configuration is global. There is no per-project override and no way to reorder segments.
+- It never acts on your behalf. It prints `↓ease`; it will not change your effort level.
 
 ## Docs
 
+- [Full documentation, inlined](https://noluyorabi.github.io/cockpit-claude/llms-full.txt): every document below concatenated into one file, for reading in a single fetch.
 - [Configuration reference](https://github.com/noluyorAbi/cockpit-claude/blob/main/docs/CONFIG.md): every segment toggle, the auto-compact buffer, limit widths, pool timings and colour overrides.
 - [FAQ](https://github.com/noluyorAbi/cockpit-claude/blob/main/docs/FAQ.md): why the context bar differs from Claude Code's number, what the cap ETA means, privacy, performance, Windows support, recovery from a blank statusline.
-- [Roadmap](https://github.com/noluyorAbi/cockpit-claude/blob/main/docs/ROADMAP.md): unclaimed gaps, including per-project config, a ledger writer, configurable segment order and a `--json` mode.
+- [Roadmap](https://github.com/noluyorAbi/cockpit-claude/blob/main/docs/ROADMAP.md): unclaimed gaps, including per-project config, a ledger writer, configurable segment order and a `--json` mode, plus what is deliberately not planned.
 - [Contributing](https://github.com/noluyorAbi/cockpit-claude/blob/main/CONTRIBUTING.md): how to add a segment, the one hard rule (`render()` must never throw), and how to run the tests.
-- [Deploying the site](https://github.com/noluyorAbi/cockpit-claude/blob/main/docs/DEPLOY.md): GitHub Pages workflow and the js.org domain ordering.
+- [Security policy](https://github.com/noluyorAbi/cockpit-claude/blob/main/SECURITY.md): threat model, what is in scope and what is not.
 
 ## Source
 
@@ -28,8 +45,10 @@ Author: Alperen Adatepe (https://adatepe.dev), GitHub @noluyorAbi.
 - [Statusline implementation](https://github.com/noluyorAbi/cockpit-claude/blob/main/src/statusline.js): the whole renderer in one file.
 - [Installer](https://github.com/noluyorAbi/cockpit-claude/blob/main/bin/cockpit.js): the `npx cockpit-claude` entry point.
 - [npm package](https://www.npmjs.com/package/cockpit-claude)
+- [Release v1.0.0](https://github.com/noluyorAbi/cockpit-claude/releases/tag/v1.0.0)
 - [Discussions](https://github.com/noluyorAbi/cockpit-claude/discussions): ideas, questions, and the showcase of projects built on top of it.
 
 ## Optional
 
-- [Website](https://noluyorabi.github.io/cockpit-claude/): includes a live simulation of the panel running the same projection maths.
+- [Website](https://noluyorabi.github.io/cockpit-claude/): carries a live simulation of the panel running the same projection maths, a hoverable reference for all fourteen segments, and the trade-offs above.
+- [Demo recording](https://noluyorabi.github.io/cockpit-claude/assets/demo.mp4): sixteen seconds of real captured output, not a recreation.

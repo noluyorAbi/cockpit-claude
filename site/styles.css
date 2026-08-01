@@ -539,6 +539,21 @@ h4 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
 .detail-in { animation: detail-in var(--t-ui) var(--ease) both; }
 @keyframes detail-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
 
+/* --- recording -------------------------------------------------------------- */
+
+/* preload="none" means nothing downloads until play is pressed, so the poster
+   carries the whole first impression. Reserving the aspect ratio keeps it from
+   shifting the page once the metadata arrives. */
+.recording {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--term-edge);
+  border-radius: var(--r-lg);
+  background: var(--term-bg);
+}
+
 /* --- trade-off ledger ------------------------------------------------------ */
 
 .ledger { display: grid; gap: 16px; }

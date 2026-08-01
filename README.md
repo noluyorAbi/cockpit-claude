@@ -30,12 +30,12 @@ ctx ██████░░░░  65% │ in:128.4k out:22.9k cache:1.94M │ 
 ```
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/noluyorAbi/cockpit-claude/main/assets/demo.gif" alt="Terminal recording: npx cockpit-claude --preview printing the four-line panel, with the 5-hour window projecting past its cap" width="100%">
+  <img src="https://raw.githubusercontent.com/noluyorAbi/cockpit-claude/main/site/assets/demo.gif" alt="Terminal recording: npx cockpit-claude --preview printing the four-line panel, with the 5-hour window projecting past its cap" width="100%">
 </p>
 
 <p align="center">
   <sub>Real output from <code>npx cockpit-claude --preview</code>, captured rather than retyped.
-  <a href="https://raw.githubusercontent.com/noluyorAbi/cockpit-claude/main/assets/demo.mp4">Higher-quality mp4</a> ·
+  <a href="https://raw.githubusercontent.com/noluyorAbi/cockpit-claude/main/site/assets/demo.mp4">Higher-quality mp4</a> ·
   <a href="https://noluyorabi.github.io/cockpit-claude/">Live simulation on the website</a></sub>
 </p>
 
@@ -160,9 +160,10 @@ cockpit only reads it; writing it is someone else's job. No file, no segment.
 ## Development
 
 ```bash
-npm run preview            # render a sample panel
-npm test                   # render fixtures, assert the panel survives bad input
-./scripts/build-banner.sh  # re-render site/assets/banner.png from scripts/banner.html
+npm run preview               # render a sample panel
+npm test                      # render fixtures, assert the panel survives bad input
+node scripts/build-llms.js    # regenerate site/llms-full.txt from the docs
+cd video && npm run build     # re-render the banner, og image, mp4 and gif
 ```
 
 The site in `site/` is static: plain HTML, one stylesheet, one script, no build step.

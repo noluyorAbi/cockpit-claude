@@ -16,7 +16,8 @@
   ],
   "scripts": {
     "preview": "node bin/cockpit.js --preview",
-    "test": "node scripts/test.js"
+    "test": "node scripts/test.js && node scripts/build-llms.js --check",
+    "llms": "node scripts/build-llms.js"
   },
   "keywords": [
     "claude",

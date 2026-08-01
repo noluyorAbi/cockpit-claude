@@ -85,12 +85,18 @@ open-source tool whose whole documentation is public.
 
 ## Social preview
 
-`site/assets/banner.png` is the 1280x640 GitHub social preview. Set it under
-**Settings → General → Social preview → Upload an image**. It is also the image
-`og:image` points at, and the header of the README.
+`site/assets/og.png` is the 1280x640 GitHub social preview. Set it under
+**Settings → General → Social preview → Upload an image**. It is also what `og:image`
+points at. The README header is the wider `site/assets/banner.png` instead.
 
-Re-render it from source rather than editing the PNG:
+Re-render it from source rather than editing the PNG. All four assets come from
+the Remotion workspace in `video/`, whose only project-specific file is
+`src/content.ts`:
 
 ```bash
-./scripts/build-banner.sh
+cd video
+npm run render:social    # site/assets/og.png,     1280x640, og:image + social preview
+npm run render:banner    # site/assets/banner.png, 1584x396, README hero
+npm run render:mp4       # site/assets/demo.mp4
+npm run render:gif       # site/assets/demo.gif
 ```

@@ -1,12 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
   <url>
     <loc>https://noluyorabi.github.io/cockpit-claude/</loc>
+    <lastmod>2026-08-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://noluyorabi.github.io/cockpit-claude/assets/og.png</image:loc>
+      <image:title>cockpit, a four-line statusline for Claude Code</image:title>
+      <image:caption>The cockpit statusline printing real terminal output: a usable-context bar, session spend and burn rate, and a 5-hour rate limit projecting past its cap.</image:caption>
+    </image:image>
+    <video:video>
+      <video:thumbnail_loc>https://noluyorabi.github.io/cockpit-claude/assets/demo-poster.jpg</video:thumbnail_loc>
+      <video:title>cockpit-claude running in a terminal</video:title>
+      <video:description>Sixteen seconds of captured output from npx cockpit-claude --preview, showing the four-line panel with the context bar, session spend and the 5-hour window projecting past its cap.</video:description>
+      <video:content_loc>https://noluyorabi.github.io/cockpit-claude/assets/demo.mp4</video:content_loc>
+      <video:duration>16</video:duration>
+      <video:family_friendly>yes</video:family_friendly>
+      <video:live>no</video:live>
+    </video:video>
   </url>
   <url>
     <loc>https://noluyorabi.github.io/cockpit-claude/llms.txt</loc>
+    <lastmod>2026-08-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://noluyorabi.github.io/cockpit-claude/llms-full.txt</loc>
+    <lastmod>2026-08-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>

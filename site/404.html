@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>404 / cockpit · claude</title>
+<meta name="description" content="That page does not exist on cockpit.js.org.">
+<meta name="robots" content="noindex, follow">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f2f0e8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d0c0a" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* The panel renders a real 404 rather than a decorative one: same segment
+     grammar, same colours, saying the thing that actually went wrong. */
+  .nf { min-height: 76vh; display: grid; align-content: center; justify-items: start; }
+  /* The global h1 carries `margin: 0 auto` for the centred hero; here the
+     heading has to line up with the kicker above it. */
+  .nf h1 { font-size: clamp(2.4rem, 6vw, 3.6rem); margin: 0 0 18px; max-width: 18ch; }
+  .nf .nf-panel, .nf .section-lede { justify-self: stretch; }
+  .nf-panel {
+    margin: 8px 0 30px; padding: 18px 20px;
+    font-family: var(--mono); font-size: clamp(11px, 1.5vw, 13.5px); line-height: 1.95;
+    background: var(--term-bg); border: 1px solid var(--term-edge);
+    border-radius: var(--r-lg); color: var(--t-fg);
+    white-space: pre; overflow-x: auto;
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="./">
+    <span class="beacon" aria-hidden="true" style="display:inline-block"></span>
+    <span class="brand-name">COCKPIT</span>
+    <span class="brand-sep">·</span>
+    <span class="brand-sub">CLAUDE</span>
+  </a>
+  <nav class="nav" aria-label="Primary">
+    <a class="ext ghost" href="https://github.com/noluyorAbi/cockpit-claude">GitHub<span aria-hidden="true">↗</span></a>
+  </nav>
+</header>
+
+<main class="band nf">
+  <p class="kicker">404</p>
+  <h1>That segment isn't rendering.</h1>
+
+  <div class="nf-panel" role="img" aria-label="A statusline panel reporting that the requested page was not found.">
+<span class="c-magenta bold">404</span><span class="c-red bold"> ·not found</span><span class="c-dim"> │ </span><span class="c-cyan">style:default</span><span class="c-dim"> │ </span><span class="c-bcyan">▸ the page you asked for</span>
+<span class="c-dim">ctx </span><span class="c-green">░░░░░░░░░░   0%</span><span class="c-dim"> │ </span><span class="c-gray">in:0 out:0 cache:0</span><span class="c-dim"> │ </span><span class="c-green">$0.00</span>
+<span class="bold">▶ Try the front page instead</span><span class="c-dim"> │ todos:0/1</span></div>
+
+  <p class="section-lede">
+    Either the link was wrong or something moved. The front page has everything:
+    what the tool shows, what it costs you, and how to install it.
+  </p>
+
+  <div class="cta-stack">
+    <a class="cta primary" href="./">Back to the front page</a>
+    <a class="cta" href="https://github.com/noluyorAbi/cockpit-claude/issues/new/choose">Report a broken link <span aria-hidden="true">↗</span></a>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="foot-inner">
+    <p class="mono">Built for <strong>Claude Code</strong> <span class="dim">·</span> MIT</p>
+    <nav class="mono foot-nav" aria-label="Footer">
+      <a href="./">Home</a>
+      <a href="llms.txt">llms.txt</a>
+      <a href="https://github.com/noluyorAbi/cockpit-claude">GitHub<span aria-hidden="true">↗</span></a>
+    </nav>
+  </div>
+</footer>
+
+</body>
+</html>
