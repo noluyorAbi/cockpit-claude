@@ -1,5 +1,15 @@
 node_modules/
 *.log
 .DS_Store
-.claude/
 *.tgz
+
+# never publish an environment file
+.env
+.env.*
+!.env.example
+
+# local run state for the launch tooling
+.launch/
+
+# per-repo cost ledger the statusline reads; it is your data, not the project's
+.claude/
