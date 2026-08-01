@@ -8,33 +8,50 @@
    =========================================================================== */
 
 :root {
+  /* Three surfaces, four text levels, hairline rules. Depth comes from surface
+     tint and a 1px border, never from a shadow: this is a developer tool, and a
+     flat, dense surface reads as precision rather than as a floating card. */
+
   /* dark values live here once, referenced by both dark triggers below */
-  --d-paper:     #0c0b09;
-  --d-sheet:     #141310;
+  --d-paper:     #0d0c0a;
+  --d-surface:   #131210;
+  --d-raised:    #191713;
   --d-ink:       #ece8dd;
+  --d-secondary: #bdb7a8;
   --d-muted:     #948e80;
   --d-faint:     #6b6659;
-  --d-rule:      rgba(236, 232, 221, 0.13);
-  --d-rule-soft: rgba(236, 232, 221, 0.07);
+  --d-rule:      rgba(236, 232, 221, 0.12);
+  --d-rule-soft: rgba(236, 232, 221, 0.06);
   --d-accent:    #dfa440;
   --d-accent-ink:#f0bb63;
   --d-hot:       #ef6a5c;
   --d-good:      #7fbf68;
-  --d-shadow:    0 1px 2px rgba(0,0,0,.4), 0 20px 50px -24px rgba(0,0,0,.8);
-  --d-term-bg:   #100f0b;
+  --d-term-bg:   #080806;
 
-  --paper:      #eceadf;
-  --sheet:      #f4f2eb;
+  --paper:      #f2f0e8;
+  --surface:    #ebe8dd;
+  --raised:     #f8f6f0;
   --ink:        #16150f;
+  --secondary:  #423e34;
   --muted:      #6b6658;
   --faint:      #a49d8c;
-  --rule:       rgba(22, 21, 15, 0.11);
-  --rule-soft:  rgba(22, 21, 15, 0.06);
+  --rule:       rgba(22, 21, 15, 0.10);
+  --rule-soft:  rgba(22, 21, 15, 0.055);
   --accent:     #b5731a;
   --accent-ink: #8a5610;
   --hot:        #c0392b;
   --good:       #3f7a2c;
-  --shadow:     0 1px 2px rgba(22,21,15,.05), 0 12px 40px -18px rgba(22,21,15,.22);
+
+  /* One radius system, sharp end of the scale. Technical, not friendly. */
+  --r-sm:  6px;
+  --r:     8px;
+  --r-lg:  12px;
+  --r-pill: 999px;
+
+  /* Content column. The terminal panel is allowed to run wider than prose. */
+  --col:      1120px;
+  --col-wide: 1280px;
+  --gutter:   clamp(20px, 5vw, 56px);
 
   /* the terminal keeps its own palette in both themes */
   --term-bg:    #17160f;
@@ -68,24 +85,24 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --paper: var(--d-paper);         --sheet: var(--d-sheet);
-    --ink: var(--d-ink);             --muted: var(--d-muted);
-    --faint: var(--d-faint);         --rule: var(--d-rule);
-    --rule-soft: var(--d-rule-soft); --accent: var(--d-accent);
+    --paper: var(--d-paper);           --surface: var(--d-surface);
+    --raised: var(--d-raised);         --ink: var(--d-ink);
+    --secondary: var(--d-secondary);   --muted: var(--d-muted);
+    --faint: var(--d-faint);           --rule: var(--d-rule);
+    --rule-soft: var(--d-rule-soft);   --accent: var(--d-accent);
     --accent-ink: var(--d-accent-ink); --hot: var(--d-hot);
-    --good: var(--d-good);           --shadow: var(--d-shadow);
-    --term-bg: var(--d-term-bg);
+    --good: var(--d-good);             --term-bg: var(--d-term-bg);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --paper: var(--d-paper);         --sheet: var(--d-sheet);
-  --ink: var(--d-ink);             --muted: var(--d-muted);
-  --faint: var(--d-faint);         --rule: var(--d-rule);
-  --rule-soft: var(--d-rule-soft); --accent: var(--d-accent);
+  --paper: var(--d-paper);           --surface: var(--d-surface);
+  --raised: var(--d-raised);         --ink: var(--d-ink);
+  --secondary: var(--d-secondary);   --muted: var(--d-muted);
+  --faint: var(--d-faint);           --rule: var(--d-rule);
+  --rule-soft: var(--d-rule-soft);   --accent: var(--d-accent);
   --accent-ink: var(--d-accent-ink); --hot: var(--d-hot);
-  --good: var(--d-good);           --shadow: var(--d-shadow);
-  --term-bg: var(--d-term-bg);
+  --good: var(--d-good);             --term-bg: var(--d-term-bg);
   color-scheme: dark;
 }
 :root[data-theme="light"] { color-scheme: light; }
@@ -107,7 +124,7 @@ body {
 }
 
 .skip { position: absolute; left: -9999px; background: var(--ink); color: var(--paper);
-        padding: 10px 16px; border-radius: 8px; z-index: 99; }
+        padding: 10px 16px; border-radius: var(--r); z-index: 99; }
 .skip:focus { left: 16px; top: 16px; }
 
 .visually-hidden {
@@ -126,7 +143,7 @@ a { color: inherit; }
 :where(a, button, summary, input, [tabindex]):focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
-  border-radius: 6px;
+  border-radius: var(--r-sm);
 }
 
 /* --- scroll progress ------------------------------------------------------- */
@@ -189,7 +206,7 @@ a { color: inherit; }
 .nav a span { margin-left: 3px; font-size: 10px; opacity: .6; }
 .nav .ghost::after { display: none; }
 .nav .ghost {
-  padding: 7px 13px; border: 1px solid var(--rule); border-radius: 9px;
+  padding: 7px 13px; border: 1px solid var(--rule); border-radius: var(--r);
   transition: border-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease),
               transform var(--t-fast) var(--ease);
 }
@@ -198,7 +215,7 @@ a { color: inherit; }
 
 .theme {
   display: inline-flex; align-items: center; gap: 7px;
-  padding: 6px 11px; border: 1px solid var(--rule); border-radius: 9px;
+  padding: 6px 11px; border: 1px solid var(--rule); border-radius: var(--r);
   background: transparent; color: var(--muted); cursor: pointer;
   font-family: var(--mono); font-size: 11px; letter-spacing: .1em;
   transition: color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease),
@@ -215,19 +232,36 @@ a { color: inherit; }
 
 /* --- sheet ----------------------------------------------------------------- */
 
-.sheet {
-  max-width: 1060px;
-  margin: 0 auto clamp(40px, 8vw, 90px);
-  padding: clamp(28px, 6vw, 78px) clamp(20px, 5vw, 62px) clamp(20px, 4vw, 40px);
-  background: var(--sheet);
-  border: 1px solid var(--rule-soft);
-  border-radius: 26px;
-  box-shadow: var(--shadow);
+/* --- layout ----------------------------------------------------------------
+   Sections run edge to edge so a tinted band is a real horizontal stripe
+   across the viewport. Content is centred by constraining the section's own
+   children, which keeps the markup flat: no wrapper div per section. */
+
+.sheet { max-width: none; margin: 0; padding: 0; background: none; border: 0; }
+
+/* The content column is created by padding, not by a max-width on the children.
+   Constraining the children would re-centre anything that carries its own
+   max-width (the headings, the ledes) and knock it out of alignment with the
+   rest of the section. */
+.band,
+.hero,
+.footer {
+  padding-inline: max(var(--gutter), (100% - var(--col)) / 2);
+}
+
+/* A tinted band is the only structural device on the page. Alternating it
+   against the base surface is what separates one idea from the next. */
+.band.tint {
+  background: var(--surface);
+  border-block: 1px solid var(--rule-soft);
 }
 
 /* --- hero ------------------------------------------------------------------ */
 
-.hero { text-align: center; }
+.hero {
+  text-align: center;
+  padding-block: clamp(56px, 9vw, 120px) clamp(48px, 7vw, 88px);
+}
 
 .eyebrow {
   display: inline-flex; align-items: center; flex-wrap: wrap; justify-content: center; gap: 9px;
@@ -245,7 +279,7 @@ a { color: inherit; }
   80%           { opacity: .45; transform: scale(.7); }
 }
 .oss-chip {
-  margin-left: 4px; padding: 4px 9px; border-radius: 100px;
+  margin-left: 4px; padding: 4px 9px; border-radius: var(--r-pill);
   border: 1px solid color-mix(in oklab, var(--good) 40%, transparent);
   color: var(--good); text-decoration: none; font-size: 10px; letter-spacing: .16em;
   transition: background var(--t-fast) var(--ease);
@@ -266,19 +300,18 @@ h1 {
 
 .panel-wrap {
   margin: clamp(34px, 5vw, 56px) 0 0;
-  border-radius: 15px;
+  border-radius: var(--r-lg);
   background: var(--term-bg);
   border: 1px solid var(--term-edge);
   overflow: hidden;
   text-align: left;
-  box-shadow: 0 1px 0 rgba(255,255,255,.04) inset, 0 22px 46px -26px rgba(0,0,0,.65);
-  transition: box-shadow 400ms var(--ease);
+  transition: border-color 400ms var(--ease), box-shadow 400ms var(--ease);
 }
+/* The one place a glow is allowed: it is a state change the user is meant to
+   notice, not decoration. */
 .panel-wrap.hot {
-  box-shadow: 0 1px 0 rgba(255,255,255,.04) inset,
-              0 22px 46px -26px rgba(0,0,0,.65),
-              0 0 0 1px color-mix(in oklab, var(--t-red) 55%, transparent),
-              0 0 34px -6px color-mix(in oklab, var(--t-red) 45%, transparent);
+  border-color: color-mix(in oklab, var(--t-red) 55%, transparent);
+  box-shadow: 0 0 32px -8px color-mix(in oklab, var(--t-red) 45%, transparent);
 }
 
 .panel-chrome {
@@ -326,7 +359,7 @@ h1 {
 }
 .tp-btn {
   flex: none; width: 30px; height: 30px; display: grid; place-items: center;
-  border: 1px solid var(--term-edge); border-radius: 8px;
+  border: 1px solid var(--term-edge); border-radius: var(--r);
   background: rgba(255, 246, 220, 0.05); color: var(--t-fg);
   font-size: 10px; cursor: pointer;
   transition: background var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
@@ -397,18 +430,17 @@ input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.4); }
 .cmd {
   display: inline-flex; align-items: center; gap: 12px; margin: 0 auto;
   padding: 15px 15px 15px 20px;
-  background: var(--term-bg); border: 1px solid var(--term-edge); border-radius: 12px;
+  background: var(--term-bg); border: 1px solid var(--term-edge); border-radius: var(--r-lg);
   cursor: pointer; font-family: var(--mono); font-size: clamp(13px, 1.7vw, 15.5px);
   color: var(--t-fg);
-  transition: transform var(--t-fast) var(--ease), box-shadow var(--t-ui) var(--ease);
-  box-shadow: 0 12px 30px -22px rgba(0,0,0,.8);
+  transition: transform var(--t-fast) var(--ease), border-color var(--t-ui) var(--ease);
 }
-.cmd:hover { transform: translateY(-2px); box-shadow: 0 20px 36px -22px rgba(0,0,0,.8); }
+.cmd:hover { transform: translateY(-2px); border-color: rgba(255, 246, 220, 0.26); }
 .cmd:active { transform: translateY(0) scale(.97); transition-duration: var(--t-press); }
 .cmd .prompt { color: var(--t-green); }
 
 .copy-label {
-  min-width: 74px; padding: 7px 12px; border-radius: 7px;
+  min-width: 74px; padding: 7px 12px; border-radius: var(--r-sm);
   background: rgba(255, 246, 220, 0.09);
   font-size: 10.5px; font-weight: 700; letter-spacing: .13em; color: var(--t-dim);
   transition: background var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
@@ -431,7 +463,7 @@ input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.4); }
 }
 .specs li {
   display: flex; align-items: baseline; gap: 7px;
-  padding: 9px 16px; border: 1px solid var(--rule); border-radius: 100px;
+  padding: 9px 16px; border: 1px solid var(--rule); border-radius: var(--r-pill);
   transition: border-color var(--t-ui) var(--ease), transform var(--t-ui) var(--ease);
 }
 .specs li:hover { border-color: color-mix(in oklab, var(--accent) 50%, var(--rule)); transform: translateY(-2px); }
@@ -441,11 +473,13 @@ input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.4); }
 /* --- sections -------------------------------------------------------------- */
 
 .band {
-  scroll-margin-top: 84px;
-  margin-top: clamp(72px, 12vw, 132px);
-  padding-top: clamp(40px, 6vw, 60px);
-  border-top: 1px solid var(--rule-soft);
+  scroll-margin-top: 68px;
+  padding-block: clamp(64px, 9vw, 108px);
 }
+/* Consecutive untinted bands still need a seam, but a tinted one already has
+   its own border and would otherwise double up. */
+.band + .band:not(.tint) { border-top: 1px solid var(--rule-soft); }
+.band.tint + .band:not(.tint) { border-top: 0; }
 
 .kicker { margin: 0 0 16px; font-family: var(--mono); font-size: 11px; font-weight: 500;
           letter-spacing: .2em; color: var(--faint); }
@@ -478,7 +512,7 @@ h4 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
 
 .mini {
   margin-top: 18px; padding: 14px 16px;
-  background: var(--term-bg); border: 1px solid var(--term-edge); border-radius: 11px;
+  background: var(--term-bg); border: 1px solid var(--term-edge); border-radius: var(--r-lg);
   font-size: clamp(10.5px, 1.25vw, 12.5px); line-height: 2; color: var(--t-fg);
   overflow-x: auto;
 }
@@ -494,14 +528,14 @@ h4 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
 
 .detail {
   min-height: 132px; padding: 22px 24px;
-  border: 1px solid var(--rule); border-radius: 14px;
-  background: color-mix(in oklab, var(--paper) 55%, var(--sheet));
+  border: 1px solid var(--rule); border-radius: var(--r-lg);
+  background: var(--raised);
 }
 .detail-idle { margin: 0; color: var(--faint); font-family: var(--mono); font-size: 13px; }
 .detail-name { margin: 0 0 4px; font-family: var(--mono); font-size: 12px; font-weight: 700;
                letter-spacing: .13em; text-transform: uppercase; color: var(--accent-ink); }
 .detail-sample { margin: 0 0 12px; font-family: var(--mono); font-size: 15px;
-                 padding: 9px 13px; border-radius: 8px;
+                 padding: 9px 13px; border-radius: var(--r);
                  background: var(--term-bg); color: var(--t-fg);
                  display: inline-block; white-space: pre; max-width: 100%; overflow-x: auto; }
 .detail-text { margin: 0; color: var(--muted); max-width: 64ch; text-wrap: pretty; }
@@ -515,8 +549,8 @@ h4 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
 
 .ledger-col {
   padding: 24px 24px 26px;
-  border: 1px solid var(--rule); border-radius: 16px;
-  background: color-mix(in oklab, var(--paper) 42%, var(--sheet));
+  border: 1px solid var(--rule); border-radius: var(--r-lg);
+  background: var(--raised);
   position: relative; overflow: hidden;
 }
 .ledger-col::before {
@@ -530,7 +564,7 @@ h4 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
                letter-spacing: .16em; text-transform: uppercase; color: var(--good); }
 .ledger-col.con .ledger-head { color: var(--hot); }
 .ledger-sign {
-  width: 20px; height: 20px; display: grid; place-items: center; border-radius: 6px;
+  width: 20px; height: 20px; display: grid; place-items: center; border-radius: var(--r-sm);
   background: color-mix(in oklab, currentColor 16%, transparent);
   font-size: 13px; line-height: 1;
 }
@@ -556,7 +590,7 @@ h4 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
 .estate-term {
   display: grid; gap: 3px; padding: 12px;
   width: max-content;
-  border: 1px solid var(--term-edge); border-radius: 10px; background: var(--term-bg);
+  border: 1px solid var(--term-edge); border-radius: var(--r); background: var(--term-bg);
 }
 .estate-row { width: 168px; height: 3px; border-radius: 2px; background: rgba(230,226,213,.12); }
 .estate-row.used { background: var(--t-orange); }
@@ -578,7 +612,7 @@ h4 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
 .road {
   display: grid; grid-template-columns: auto 1fr auto; align-items: baseline; gap: 14px;
   padding: 14px 16px;
-  border: 1px solid var(--rule); border-radius: 12px;
+  border: 1px solid var(--rule); border-radius: var(--r-lg);
   background: transparent;
   text-decoration: none;
   transition: border-color var(--t-ui) var(--ease), background var(--t-ui) var(--ease),
@@ -594,7 +628,7 @@ h4 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
 .road-body p { margin: 0; font-size: 13.6px; color: var(--muted); }
 .road-tag {
   font-family: var(--mono); font-size: 10px; letter-spacing: .12em;
-  padding: 4px 9px; border-radius: 100px; white-space: nowrap;
+  padding: 4px 9px; border-radius: var(--r-pill); white-space: nowrap;
   border: 1px solid var(--rule); color: var(--muted);
 }
 .road-tag.help { color: var(--good); border-color: color-mix(in oklab, var(--good) 40%, transparent); }
@@ -605,8 +639,8 @@ h4 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
 .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
 .card {
   padding: 22px 22px 24px;
-  border: 1px solid var(--rule); border-radius: 14px;
-  background: color-mix(in oklab, var(--paper) 45%, var(--sheet));
+  border: 1px solid var(--rule); border-radius: var(--r-lg);
+  background: var(--raised);
   transition: transform var(--t-ui) var(--ease), border-color var(--t-ui) var(--ease);
 }
 .card:hover { transform: translateY(-3px); border-color: color-mix(in oklab, var(--accent) 45%, var(--rule)); }
@@ -619,7 +653,7 @@ h4 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
 
 /* --- code block ------------------------------------------------------------ */
 
-.code-block { border: 1px solid var(--term-edge); border-radius: 14px; overflow: hidden; background: var(--term-bg); }
+.code-block { border: 1px solid var(--term-edge); border-radius: var(--r-lg); overflow: hidden; background: var(--term-bg); }
 .code-head {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
   padding: 9px 12px 9px 18px;
@@ -627,7 +661,7 @@ h4 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
   font-size: 11.5px; color: var(--t-dim); letter-spacing: .05em;
 }
 .code-copy, .snip-copy {
-  border: 1px solid var(--term-edge); border-radius: 7px;
+  border: 1px solid var(--term-edge); border-radius: var(--r-sm);
   background: rgba(255, 246, 220, 0.06); color: var(--t-dim);
   font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: .12em;
   padding: 6px 11px; cursor: pointer;
@@ -649,15 +683,15 @@ h4 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
 .tabs { margin-bottom: 26px; }
 .tabs-rail {
   position: relative; display: inline-flex; gap: 2px; padding: 4px;
-  border: 1px solid var(--rule); border-radius: 12px;
-  background: color-mix(in oklab, var(--paper) 50%, var(--sheet));
+  border: 1px solid var(--rule); border-radius: var(--r-lg);
+  background: var(--raised);
   max-width: 100%; overflow-x: auto; scrollbar-width: none;
 }
 .tabs-rail::-webkit-scrollbar { display: none; }
 .tab {
   position: relative; z-index: 1;
   border: none; background: transparent; cursor: pointer;
-  padding: 9px 18px; border-radius: 9px; white-space: nowrap;
+  padding: 9px 18px; border-radius: var(--r); white-space: nowrap;
   font-family: var(--mono); font-size: 12.5px; letter-spacing: .05em;
   color: var(--muted);
   transition: color var(--t-fast) var(--ease);
@@ -666,7 +700,7 @@ h4 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
 .tab[aria-selected="true"] { color: var(--paper); }
 .tabs-pill {
   position: absolute; z-index: 0; top: 4px; bottom: 4px; left: 0;
-  border-radius: 9px; background: var(--ink);
+  border-radius: var(--r); background: var(--ink);
   transform: translateX(var(--x, 0)); width: var(--w, 0);
   transition: transform var(--t-ui) var(--ease-inout), width var(--t-ui) var(--ease-inout);
 }
@@ -682,8 +716,8 @@ h4 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
 
 .giscus-fallback {
   padding: 34px 26px; text-align: center;
-  border: 1px dashed var(--rule); border-radius: 16px;
-  background: color-mix(in oklab, var(--paper) 40%, var(--sheet));
+  border: 1px dashed var(--rule); border-radius: var(--r-lg);
+  background: var(--raised);
 }
 .giscus-fallback h4 { margin-bottom: 8px; }
 .giscus-fallback p { margin: 0 auto 20px; max-width: 48ch; color: var(--muted); font-size: 14.5px; }
@@ -694,8 +728,8 @@ h4 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
 .showcase-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
 .showcase-card {
   display: block; padding: 20px 22px 22px;
-  border: 1px solid var(--rule); border-radius: 14px; text-decoration: none;
-  background: color-mix(in oklab, var(--paper) 45%, var(--sheet));
+  border: 1px solid var(--rule); border-radius: var(--r-lg); text-decoration: none;
+  background: var(--raised);
   transition: transform var(--t-ui) var(--ease), border-color var(--t-ui) var(--ease);
 }
 .showcase-card:hover { transform: translateY(-3px); border-color: color-mix(in oklab, var(--accent) 50%, var(--rule)); }
@@ -708,12 +742,12 @@ h4 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
 .empty {
   display: grid; justify-items: center; gap: 6px;
   padding: 52px 26px 46px; text-align: center;
-  border: 1px dashed var(--rule); border-radius: 16px;
+  border: 1px dashed var(--rule); border-radius: var(--r-lg);
 }
 .empty-art { display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
              font-family: var(--mono); font-size: 13px; color: var(--faint); }
 .empty-box {
-  width: 46px; height: 30px; border: 1px dashed var(--rule); border-radius: 7px;
+  width: 46px; height: 30px; border: 1px dashed var(--rule); border-radius: var(--r-sm);
   display: grid; place-items: center; color: var(--faint);
 }
 .empty-arrow { animation: nudge 1.8s var(--ease-inout) infinite; color: var(--accent); }
@@ -732,7 +766,7 @@ h4 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
 .snippet {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
   margin-top: 12px; padding: 10px 10px 10px 16px;
-  border: 1px solid var(--term-edge); border-radius: 10px; background: var(--term-bg);
+  border: 1px solid var(--term-edge); border-radius: var(--r); background: var(--term-bg);
   overflow-x: auto;
 }
 .snippet code { color: var(--t-fg); font-size: 12.5px; white-space: pre; background: none; padding: 0; }
@@ -740,8 +774,8 @@ h4 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
 /* --- FAQ accordion --------------------------------------------------------- */
 
 .faq { display: grid; gap: 8px; }
-.qa { border: 1px solid var(--rule); border-radius: 12px; overflow: hidden;
-      background: color-mix(in oklab, var(--paper) 40%, var(--sheet)); }
+.qa { border: 1px solid var(--rule); border-radius: var(--r-lg); overflow: hidden;
+      background: var(--raised); }
 .qa summary {
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
   padding: 17px 20px; cursor: pointer; list-style: none;
@@ -764,7 +798,7 @@ h4 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
 .cta-stack { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
 .cta {
   display: inline-flex; align-items: center; gap: 9px;
-  padding: 14px 22px; border: 1px solid var(--rule); border-radius: 11px;
+  padding: 14px 22px; border: 1px solid var(--rule); border-radius: var(--r-lg);
   font-family: var(--mono); font-size: 13.5px; text-decoration: none;
   transition: transform var(--t-ui) var(--ease), border-color var(--t-ui) var(--ease),
               background var(--t-ui) var(--ease);
@@ -781,10 +815,14 @@ h4 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
 .cta.primary:hover { background: var(--ink); opacity: .9; }
 
 .footer {
-  margin-top: clamp(70px, 11vw, 120px); padding-top: 26px;
-  border-top: 1px solid var(--rule);
+  padding-block: 40px;
+  border-top: 1px solid var(--rule-soft);
+  background: var(--surface);
+  font-size: 12.5px; color: var(--muted);
+}
+.foot-inner {
   display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between;
-  gap: 20px; font-size: 12.5px; color: var(--muted);
+  gap: 20px;
 }
 .footer p { margin: 0; }
 .footer strong { color: var(--ink); font-weight: 500; }
@@ -801,13 +839,13 @@ h4 { margin: 0 0 6px; font-size: 1rem; font-weight: 600; }
 .foot-nav a span { margin-left: 3px; font-size: 10px; opacity: .6; }
 
 kbd { font-family: var(--mono); font-size: .82em; padding: 2px 6px; border-radius: 5px;
-      border: 1px solid var(--rule); border-bottom-width: 2px; background: var(--sheet); color: var(--ink); }
+      border: 1px solid var(--rule); border-bottom-width: 2px; background: var(--raised); color: var(--ink); }
 
 /* --- toast ----------------------------------------------------------------- */
 
 .toast {
   position: fixed; left: 50%; bottom: 26px; z-index: 70;
-  padding: 12px 20px; border-radius: 11px;
+  padding: 12px 20px; border-radius: var(--r-lg);
   background: var(--ink); color: var(--paper);
   font-family: var(--mono); font-size: 12.5px; letter-spacing: .04em;
   box-shadow: 0 18px 40px -20px rgba(0,0,0,.6);
