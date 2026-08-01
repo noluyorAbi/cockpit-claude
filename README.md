@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="site/assets/banner.png" alt="cockpit · claude: your session, from the flight deck" width="100%">
+  <img src="https://raw.githubusercontent.com/noluyorAbi/cockpit-claude/main/site/assets/banner.png" alt="cockpit · claude: your session, from the flight deck" width="100%">
 </p>
 
 <p align="center">
